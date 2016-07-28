@@ -1,7 +1,7 @@
 # statful-client-javascript
 Statful client for Javascript applications.
 
-[![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://https://travis-ci.org/statful/statful-client-javascript)
+[![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://travis-ci.org/statful/statful-client-javascript)
 [![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
 
 
