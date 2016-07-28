@@ -5,12 +5,18 @@ Statful client for Javascript applications.
 [![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
 
 
-## How do I get set up?
+## Install
 
 ```
-#!html
-<script type="text/javascript" src="js/statful.min.js"></script>
+bower install --save statful-client-javascript
 ```
+
+or
+ 
+```
+npm install --save statful-client-javascript
+```
+
 
 ## Timings
 
@@ -233,13 +239,6 @@ statful.initialize({
     resourceErrorsTypeBlacklist: ['img']
     ...
 });
-```
-
-
-### Use as a bower component
-
-```
-bower install --save https://{username}@bitbucket.org/mindera/telemetry-beacon-client.git#{version}
 ```
 
 ### Development
