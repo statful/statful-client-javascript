@@ -1,9 +1,7 @@
 # statful-client-javascript
 Statful client for Javascript applications.
 
-[![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg)](https://travis-ci.org/statful/statful-client-javascript)
-[![npm version](https://badge.fury.io/js/statful-client-javascript.svg)](https://badge.fury.io/js/statful-client-javascript)
-[![Dependency Status](https://david-dm.org/statful/statful-client-javascript.svg)](https://david-dm.org/statful/verifjs)
+[![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://https://travis-ci.org/statful/statful-client-javascript)
 [![devDependency Status](https://david-dm.org/mindera/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
 
 
