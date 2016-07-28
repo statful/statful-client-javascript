@@ -24,23 +24,22 @@ All methods that provider timing mechanism are based in the [user-timing](http:/
 
 ### Configuration parameters
 
-
-- dryrun: enable dryrun mode - ie. do not actually flush metrics out
-- environment: environment to be used as tag - ie. development, production, etc.
-- namespace: namespace to be used as metrics prefix - ie web, application, mobile, etc.
-- tags: global tags
-- aggregations: global aggregations
-- aggregationFrequency: aggregation frequency
-- timer, counter, gauge, other: metric type defaults
-- registerResourceErrors: enable resource error tracking
-- resourceErrorsNameTracking: track resource names on resource error tracking
-- resourceErrorsTypeBlacklist: resource error type blacklist
-- registerResourceLoading: enable resource loading tracking
-- resourceLoadingTrackingInterval: resource loading tracking interval
-- resourceLoadingTypeBlacklist: resource type blacklist
-- resourceLoadingPathFilter: resource path whitelist
-- resourceLoadingNameTracking: track resource names
-- flushInterval: metrics flush interval
+- **dryrun**: enable dryrun mode - ie. do not actually flush metrics out
+- **environment**: environment to be used as tag - ie. development, production, etc.
+- **namespace**: namespace to be used as metrics prefix - ie web, application, mobile, etc.
+- **tags**: global tags
+- **aggregations**: global aggregations
+- **aggregationFrequency**: aggregation frequency
+- **timer**, counter, gauge, other: metric type defaults
+- **registerResourceErrors**: enable resource error tracking
+- **resourceErrorsNameTracking**: track resource names on resource error tracking
+- **resourceErrorsTypeBlacklist**: resource error type blacklist
+- **registerResourceLoading**: enable resource loading tracking
+- **resourceLoadingTrackingInterval**: resource loading tracking interval
+- **resourceLoadingTypeBlacklist**: resource type blacklist
+- **resourceLoadingPathFilter**: resource path whitelist
+- **resourceLoadingNameTracking**: track resource names
+- **flushInterval**: metrics flush interval
 
 ### Register metrics
 
@@ -50,7 +49,6 @@ All methods that provider timing mechanism are based in the [user-timing](http:/
 statful.registerTimer('your.timer.metric.name', 100, {
     tags: {tagKey: 'foo'}
 });
-
 ```
 
 #### Counters
@@ -70,7 +68,6 @@ statful.registerCounter('your.counter.metric.name', {
     tags: {tagKey: 'foo'},
     aggregations: ['avg']
 });
-
 ```
 
 #### Gauges
@@ -82,7 +79,6 @@ statful.registerGauge('your.gauge.metric.name', 345, {
     aggregations: ['avg', 'last'],
     aggregationFrequency: 30
 });
-
 ```
 
 ### User Timing
@@ -205,7 +201,7 @@ Support for the resource loading error specification is available and controlled
  });
 ```
 
-IMPORTANT: If you want to track errors in every added resource you have to include and configure client, before all other things, in your header.
+**IMPORTANT:** If you want to track errors in every added resource you have to include and configure client, before all other things, in your header.
 
 That is controlled by a metric with name: '<namespace>'.counter.resource.error.
 
