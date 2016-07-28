@@ -2,7 +2,7 @@
   "name": "statful-client-javascript",
   "version": "1.0.0",
   "description": "Statful client for Javascript applications",
-  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2016 Statful <https://www.statful.com/>\n*\n*/\n",
+  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2016 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
     "test": "grunt test"
   },
@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
-    "grunt": "~0.4.5",
-    "grunt-bump": "^0.7.0",
+    "grunt": "~1.0.0",
+    "grunt-bump": "^0.8.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
