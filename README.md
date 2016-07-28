@@ -2,7 +2,7 @@
 Statful client for Javascript applications.
 
 [![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://https://travis-ci.org/statful/statful-client-javascript)
-[![devDependency Status](https://david-dm.org/mindera/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
+[![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
 
 
 ## How do I get set up?
