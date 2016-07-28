@@ -1,0 +1,35 @@
+{
+  "name": "statful-client-javascript",
+  "version": "1.0.0",
+  "description": "Statful client for Javascript applications",
+  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2016 Statful <https://www.statful.com/>\n*\n*/\n",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/statful/statful-client-javascript.git"
+  },
+  "author": "Jose Tavares <jose.tavares@mindera.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/statful/statful-client-javascript/issues"
+  },
+  "homepage": "https://github.com/statful/statful-client-javascript#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-bump": "^0.8.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^19.0.0",
+    "grunt-karma": "^2.0.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^1.1.2",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.1",
+    "load-grunt-tasks": "^3.5.0"
+  }
+}

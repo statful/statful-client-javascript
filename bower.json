@@ -1,0 +1,22 @@
+{
+  "name": "statful-client-javascript",
+  "description": "Statful client for Javascript applications",
+  "main": "src/statful-client-javascript.js",
+  "authors": [
+    "Jose Tavares <jose.tavares@mindera.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/statful/statful-client-javascript",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "usertiming": "^0.1.8",
+    "js-polyfills": "^0.1.24"
+  },
+  "devDependencies": {}
+}

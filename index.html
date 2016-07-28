@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statful Client</title>
+</head>
+<body>
+    <img src="http://www.w3.org/Icons/w3c_home" style="display: none">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="dist/statful.js"></script>
+
+    <script>
+        var scriptCaptureFunc = function (name) {
+            return name;
+        };
+
+        var srcFilterFunc = function (name) {
+            return name !== 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js';
+        };
+
+        statful.initialize({
+            dryrun: true,
+            environment: 'local',
+            appLoadedMeasureName: 'appLoaded',
+            appLoadedMetricName: 'timeto',
+            appLoadedMetricTags: {mark: 'appLoaded'},
+            registerResourceLoading: true,
+            resourceLoadingTypeBlacklist: ['img'],
+            resourceLoadingPathFilter: srcFilterFunc,
+            resourceLoadingNameTracking: {
+                script: scriptCaptureFunc
+            }
+        });
+    </script>
+</body>
+</html>
