@@ -30,7 +30,7 @@ All methods that provider timing mechanism are based in the [user-timing](http:/
 - **tags**: global tags
 - **aggregations**: global aggregations
 - **aggregationFrequency**: aggregation frequency
-- **timer**, counter, gauge, other: metric type defaults
+- **timer, counter, gauge, other**: metric type defaults
 - **registerResourceErrors**: enable resource error tracking
 - **resourceErrorsNameTracking**: track resource names on resource error tracking
 - **resourceErrorsTypeBlacklist**: resource error type blacklist
