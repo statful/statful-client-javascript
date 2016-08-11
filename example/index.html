@@ -5,38 +5,43 @@
     <title>Statful Client</title>
     <style>
         body {
-            background-color: #222222;
             text-align: center;
+            padding: 100px;
         }
-        img {
-            width: 50%;
+
+        button {
+            height: 40px;
+            width: 100px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
+    <button onclick="timer()">Send Timer</button>
+    <button onclick="count()">Send Count</button>
+    <button onclick="gauge()">Send Gauge</button>
+
     <script type="text/javascript" src="../dist/statful.js"></script>
-    <img src="logo-statful.svg">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
     <script>
-        var scriptCaptureFunc = function (name) {
-            return name;
-        };
+        function timer() {
+            statful.timer('timer-click', new Date());
+        }
 
-        var srcFilterFunc = function (name) {
-            return name !== 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js';
-        };
+        function count() {
+            statful.counter('counter-click');
+        }
+
+        function gauge() {
+            statful.gauge('gauge-click', 10);
+        }
 
         statful.initialize({
             dryrun: true,
+            debug: true,
+            app: 'statul-client',
             environment: 'local',
-            flushInterval: 5000,
-            registerResourceLoading: true,
-            resourceLoadingTypeBlacklist: ['img'],
-            resourceLoadingPathFilter: srcFilterFunc,
-            resourceLoadingNameTracking: {
-                script: scriptCaptureFunc
-            }
+            flushInterval: 5000
         });
     </script>
 </body>

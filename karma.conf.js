@@ -14,6 +14,7 @@ module.exports = function (config) {
                 {pattern: 'bower_components/usertiming/src/usertiming.js', include: true},
                 {pattern: 'bower_components/js-polyfills/es5.js', include: true},
                 {pattern: 'bower_components/js-polyfills/xhr.js', include: true},
+                {pattern: 'src/logger.js', included: true},
                 {pattern: 'src/statful.js', included: true},
                 {pattern: 'src/statful-util.js', included: true},
                 {pattern: 'tests/mock-ajax.js', included: true},

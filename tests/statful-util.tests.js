@@ -3,8 +3,7 @@ describe('Statful Util Unit testing', function () {
 
     beforeEach(function () {
         statfulUtil= new StatfulUtil({
-            apiAddress: '//beacon.telemetron.io',
-            enabled: true,
+            apiAddress: '//beacon.statful.com',
             flushInterval: 30000
         });
     });
@@ -27,7 +26,7 @@ describe('Statful Util Unit testing', function () {
         var request = jasmine.Ajax.requests.mostRecent();
 
         expect(request.method).toBe('GET');
-        expect(request.url).toBe('//beacon.telemetron.io/endpoint/?id=1');
+        expect(request.url).toBe('//beacon.statful.com/endpoint/?id=1');
 
         jasmine.Ajax.uninstall();
     });
@@ -47,7 +46,7 @@ describe('Statful Util Unit testing', function () {
         });
 
         expect(request.method).toBe('POST');
-        expect(request.url).toBe('//beacon.telemetron.io/endpoint');
+        expect(request.url).toBe('//beacon.statful.com/endpoint');
 
         jasmine.Ajax.uninstall();
     });
@@ -82,7 +81,7 @@ describe('Statful Util Unit testing', function () {
         jasmine.clock().install();
 
         statfulUtil= new StatfulUtil({
-            apiAddress: '//beacon.telemetron.io',
+            apiAddress: '//beacon.statful.com',
             dryrun: true
         });
 

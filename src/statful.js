@@ -8,52 +8,48 @@
      * application metrics. It can be called as follows:
      *
      * statful.initialize({
-     *  environment: 'local',
-     *  namespace: 'mobile'
+     *      app: 'example-app'
+     *      environment: 'local',
+     *      namespace: 'mobile',
+     *      dryrun: false,
+     *      debug: false
      *  });
-     * statful.registerMeasure('your.measure.name', 'your.metric.name');
+     *
+     * statful.counter('metricName', 1);
      *
      */
-
     var defaultConfig = {
         dryrun: false,
+        debug: false,
+        app: undefined,
         environment: undefined,
         namespace: 'web',
         tags: {},
         aggregations: [],
         aggregationFrequency: 10,
         timer: {
-            tags: {},
+            tags: {
+                unit: 'ms'
+            },
             aggregations: ['avg', 'p90', 'count']
         },
         counter: {
             tags: {},
-            aggregations: ['sum', 'count']
+            aggregations: ['avg', 'p90']
         },
         gauge: {
             tags: {},
-            aggregations: ['sum', 'count']
+            aggregations: ['last']
         },
-        other: {
-            tags: {},
-            aggregations: ['last'],
-            aggregationFrequency: 10
-        },
-        registerResourceErrors: false,
-        resourceErrorsNameTracking: {},
-        resourceErrorsTypeBlacklist: [],
-        registerResourceLoading: true,
-        resourceLoadingTrackingInterval: 5000,
-        resourceLoadingTypeBlacklist: [],
-        resourceLoadingPathFilter: function (name) {
-            return name;
-        },
-        resourceLoadingNameTracking: {},
-        flushInterval: 30000
+        timeout: 2000,
+        flushInterval: 10000
     };
 
+    var logger;
+
     var statful = {
-        apiAddress: '//beacon.telemetron.io',
+        config: {},
+        apiAddress: '//beacon.statful.com',
         endpoints: {
             metrics: 'beacon/metrics'
         },
@@ -62,130 +58,54 @@
         /**
          * Initialize the Statful client settings and register events
          */
-        initialize: function (settings) {
+        initialize: function (clientConfig) {
             var self = this;
 
-            if (typeof settings !== 'object' || settings === null) {
-                settings = {};
-            }
+            //Private functions
+            self.mergeConfigs = function (clientConfig) {
+                if (typeof clientConfig !== 'object' || clientConfig === null) {
+                    clientConfig = {};
+                }
 
-            // Set default properties
-            Object.keys(defaultConfig).forEach(function (key) {
-                self[key] = defaultConfig[key];
-            });
+                // Set default properties
+                Object.keys(defaultConfig).forEach(function (key) {
+                    self.config[key] = defaultConfig[key];
+                });
 
-            Object.keys(settings).forEach(function (key) {
-                self[key] = settings[key];
-            });
+                Object.keys(clientConfig).forEach(function (key) {
+                    self.config[key] = clientConfig[key];
+                });
+            };
 
-            self.util = new StatfulUtil({
-                apiAddress: this.apiAddress,
-                dryrun: this.dryrun,
-                flushInterval: this.flushInterval
-            });
-
-            self.util.registerQueue('metrics', this.endpoints.metrics, this.flushInterval);
-
-            if (self.registerResourceErrors) {
-                self.trackResourceErrors();
-            }
-
-            if (self.registerResourceLoading && self.util.isResourceTimingSupported()) {
-                self.trackResourceLoading();
-            }
-
-            // Metrics data object
-            self.metricsData = function (name, type, value, tags, aggregations, aggregationFrequency) {
+            self.metricsData = function (name, type, value, tags, aggregations, aggregationFrequency, namespace) {
                 return {
                     name: name,
                     type: type,
                     value: value,
-                    tags: self.util.setTags(tags, self.tags, self[type].tags, self.environment, self.app),
-                    aggregations: self.util.setAggregations(aggregations, self.aggregations, self[type].aggregations),
-                    aggregationFrequency: self.util.setAggregationFrequency(aggregationFrequency, self.aggregationFrequency, self[type].aggregationFrequency),
-                    namespace: self.namespace
+                    tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.environment, self.config.app),
+                    aggregations: self.util.setAggregations(aggregations, self.config.aggregations, self.config[type].aggregations),
+                    aggregationFrequency: self.util.setAggregationFrequency(aggregationFrequency, self.config.aggregationFrequency, self.config[type].aggregationFrequency),
+                    namespace: namespace || self.config.namespace
                 };
             };
-        },
 
-        /**
-         * Track resource load error metrics
-         */
-        trackResourceErrors: function () {
-            var self = this;
+            this.mergeConfigs(clientConfig);
 
-            // Apply user defined black list filter on resources to track errors
-            var allElementsToCatch = ['IMG', 'SCRIPT', 'LINK'];
-            var resourceErrorsTypeBlacklistUpperCase = self.resourceErrorsTypeBlacklist.map(function (value) {
-                return value.toUpperCase();
-            });
-            var resourceEntriesToTrackErrors = allElementsToCatch.filter(function filter(entry) {
-                // Exclude blacklisted types
-                return resourceErrorsTypeBlacklistUpperCase.indexOf(entry) === -1;
+            // Create Logger
+            logger = new StatfulLogger(self.config.debug);
+
+            // Create Util
+            self.util = new StatfulUtil({
+                apiAddress: this.config.apiAddress,
+                debug: this.config.debug,
+                dryrun: this.config.dryrun,
+                flushInterval: this.config.flushInterval,
+                timeout: this.config.timeout
             });
 
-            window.addEventListener('error', function (event) {
-                var element = event.target;
-                if (resourceEntriesToTrackErrors.indexOf(element.tagName) != -1) {
-                    var resourceUrl = element.tagName == 'LINK' ? element.href : element.src;
-                    var tags = {};
-                    if (self.resourceErrorsNameTracking.hasOwnProperty(element.tagName.toLowerCase())) {
-                        // Apply user defined filter to resource error name
-                        tags.resource = self.resourceErrorsNameTracking[element.tagName.toLowerCase()](resourceUrl);
-                    }
-
-                    self.util.addItemToQueue('metrics', new self.metricsData('resource.error', 'counter', 1, tags));
-
-                    // if return it's true, we avoid that error be thrown to the console too
-                    return false;
-                }
-            }, true);
+            //Register queue to send metrics
+            self.util.registerQueue('metrics', this.endpoints.metrics, this.config.flushInterval);
         },
-
-        /**
-         * Track resource loading metrics
-         */
-        trackResourceLoading: function () {
-            var self = this;
-
-            function addResourceToQueue(value, action, tags) {
-                tags.action = action;
-                self.util.addItemToQueue('metrics', new self.metricsData('resource', 'timer', value, tags));
-            }
-
-            setInterval(function trackResourceLoadingInterval() {
-                var resourceEntries = self.util.filterResources(self.resourceLoadingTypeBlacklist,
-                    self.resourceLoadingPathFilter, statful.perf.getEntriesByType('resource'));
-
-                resourceEntries.forEach(function handleResource(resource) {
-                    var tags, attrs;
-                    attrs = self.util.measureResource(resource);
-
-                    // ignore resources that have no attribute timers
-                    if (Object.getOwnPropertyNames(attrs).length > 0) {
-                        tags = self.util.tagResource(resource, self.resourceLoadingNameTracking);
-
-                        if (self.util.isResourceTimingComplete(attrs.domainLookup, attrs.connect, attrs.ssl, attrs.request, attrs.response)) {
-                            addResourceToQueue(attrs.fetch, 'fetch', tags);
-                            addResourceToQueue(attrs.domainLookup, 'domainLookup', tags);
-                            addResourceToQueue(attrs.connect, 'connect', tags);
-                            addResourceToQueue(attrs.ssl, 'ssl', tags);
-                            addResourceToQueue(attrs.request, 'request', tags);
-                            addResourceToQueue(attrs.response, 'response', tags);
-                            addResourceToQueue(attrs.load, 'load', tags);
-                        } else {
-                            addResourceToQueue(attrs.fetch, 'fetch', tags);
-                            addResourceToQueue(attrs.load, 'load', tags);
-                        }
-                    }
-                });
-
-                self.clearResources();
-            }, self.resourceLoadingTrackingInterval);
-        },
-
-        ////////////////////////////////////////
-        // user timing spec methods
 
         /**
          * Measure a timer using the user timing specification
@@ -202,7 +122,7 @@
                 // Always use the most recent measure if more exist
                 time = measure[measure.length - 1].duration;
             } else {
-                console.log('Measure ' + measureName + ' not found');
+                logger.debug('Measure ' + measureName + ' not found');
             }
 
             return time;
@@ -224,7 +144,7 @@
                     statful.perf.clearMarks();
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
@@ -235,7 +155,7 @@
             try {
                 statful.perf.clearResourceTimings();
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
@@ -253,7 +173,7 @@
                     statful.perf.clearMeasures();
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
@@ -263,13 +183,14 @@
          */
         registerMark: function (markName) {
             try {
+                logger.debug('Register Mark', markName);
                 if (markName) {
                     statful.perf.mark(markName);
                 } else {
-                    console.log('Undefined resource name to register as a mark');
+                    logger.error('Undefined resource name to register as a mark');
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
@@ -281,6 +202,7 @@
          */
         registerMeasure: function (measureName, metricName, options) {
             try {
+                logger.debug('Register Measure', measureName, metricName, options);
                 if (measureName) {
                     var defaults = {
                         clearMarks: false,
@@ -310,7 +232,7 @@
                         this.util.addItemToQueue('metrics', new this.metricsData(metricName, 'timer', time,
                             defaults.tags, defaults.aggregations, defaults.aggregationFrequency));
                     } else {
-                        console.log('Failed to get measure time to register as timer value');
+                        logger.error('Failed to get measure time to register as timer value');
                     }
 
                     if (defaults.clearMarks) {
@@ -321,91 +243,84 @@
                         this.clearMeasures([measureName]);
                     }
                 } else {
-                    console.log('Undefined resource name to register as a measure');
+                    logger.error('Undefined resource name to register as a measure');
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
-        ////////////////////////////////////////
-        // statful client access methods
-
         /**
          * Register timer
-         * @param {string} metricName - metric name to be used as metric name (Ex: timeto.firstclick)
+         * @param {string} metricName - metric name to be used as metric name
          * @param {number} metricValue - timer value to be sent
-         * @param {object} options - set of option (tags and aggregations)
+         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
          */
-        registerTimer: function (metricName, metricValue, options) {
+        timer: function (metricName, metricValue, options) {
             try {
+                logger.debug('Register Timer', metricName, metricValue, options);
                 if (metricName && metricValue) {
                     options = options || {};
 
                     // Push metrics to queue
-                    this.util.addItemToQueue('metrics', new this.metricsData(metricName, 'timer', metricValue,
-                        options.tags, options.aggregations, options.aggregationFrequency));
+                    var item = new this.metricsData(metricName, 'timer', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    this.util.addItemToQueue('metrics', item);
                 } else {
-                    console.log('Undefined metric name/value to register as a timer');
+                    logger.error('Undefined metric name/value to register as a timer');
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
         /**
          * Register counter
-         * @param {string} metricName metric name to be sent (Ex: navigation.success)
-         * @param {object} options - set of option (metricValue, tags and aggregations)
+         * @param {string} metricName - metric name to be sent
+         * @param {number} metricValue - count value to be sent
+         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
          */
-        registerCounter: function (metricName, options) {
+        counter: function (metricName, metricValue, options) {
             try {
-                console.log(metricName);
+                logger.debug('Register Counter', metricName, options);
+                metricValue = metricValue || 1;
 
                 if (metricName) {
                     options = options || {};
 
-                    // Set counter default value if not defined
-                    options.metricValue = options.metricValue || 1;
-
                     // Push metrics to queue
-                    this.util.addItemToQueue('metrics', new this.metricsData(metricName, 'counter', options.metricValue,
-                        options.tags, options.aggregations, options.aggregationFrequency));
+                    var item = new this.metricsData(metricName, 'counter', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    this.util.addItemToQueue('metrics', item);
                 } else {
-                    console.log('Undefined metric name to register as a counter');
+                    logger.error('Undefined metric name to register as a counter');
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         },
 
         /**
          * Register gauge
-         * @param {string} metricName metric name to be sent (Ex: navigation.success)
+         * @param {string} metricName metric name to be sent
          * @param {number} metricValue gauge value to be sent
-         * @param {object} options - set of option (tags and aggregations)
+         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
          */
-        registerGauge: function (metricName, metricValue, options) {
+        gauge: function (metricName, metricValue, options) {
             try {
+                logger.debug('Register Gauge', metricName, metricValue, options);
                 if (metricName && metricValue) {
                     options = options || {};
 
                     // Push metrics to queue
-                    this.util.addItemToQueue('metrics', new this.metricsData(metricName, 'gauge', metricValue,
-                        options.tags, options.aggregations, options.aggregationFrequency));
+                    var item = new this.metricsData(metricName, 'gauge', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    this.util.addItemToQueue('metrics', item);
                 } else {
-                    console.log('Undefined metric name/value to register as a gauge');
+                    logger.error('Undefined metric name/value to register as a gauge');
                 }
             } catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         }
     };
-
-    //# Polyfill
-    window.addEventListener = window.addEventListener || function (e, f) {
-            window.attachEvent('on' + e, f);
-        };
 
     window.statful = statful;
 

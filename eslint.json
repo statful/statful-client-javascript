@@ -1,6 +1,7 @@
 {
     "globals": {
         "StatfulUtil": true,
+        "StatfulLogger": true,
 
         "module": true,
         "require": true,
