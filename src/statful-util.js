@@ -19,14 +19,11 @@
         /**
          * Sends HTTP request to the api
          * @param {string} endpoint - action
-         * @param {string} type - GET /POST
          * @param {string} requestData - request data
          */
-        this.sendRequest = function (endpoint, type, requestData) {
+        this.sendRequest = function (endpoint, requestData) {
             try {
                 var requestArr = [this.config.apiAddress, endpoint];
-                var urlParams = type == 'GET' ? requestData : null;
-                urlParams ? requestArr.push(urlParams) : null;
                 var requestUrl = requestArr.join('/');
 
                 logger.debug('Request: ' + requestUrl);
@@ -34,18 +31,19 @@
                 var xmlHttp = new XMLHttpRequest();
                 xmlHttp.timeout = config.timeout;
 
-                xmlHttp.open(type, requestUrl, true);
+                xmlHttp.open('POST', requestUrl, true);
 
-                switch (type) {
-                    case 'POST':
-                        //Send the proper header information along with the request
-                        xmlHttp.setRequestHeader('Content-type', 'application/json');
-                        xmlHttp.send(requestData);
-                        break;
-                    case 'GET':
-                        xmlHttp.send(null);
-                        break;
-                }
+                //Send the proper header information along with the request
+                xmlHttp.setRequestHeader('Content-type', 'application/json');
+                xmlHttp.send(requestData);
+
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        logger.debug('Successfully send metric');
+                    } else {
+                        logger.error('Failed to send metric', requestUrl, xmlHttp.status);
+                    }
+                };
             }
             catch (ex) {
                 logger.error(ex);
@@ -74,7 +72,7 @@
 
                     if (queue.data.length > 0) {
                         if (!self.config.dryrun) {
-                            self.sendRequest(queue.endpoint, 'POST', JSON.stringify(queue.data));
+                            self.sendRequest(queue.endpoint, JSON.stringify(queue.data));
                         } else {
                             logger.debug('Dryrun data', queue.endpoint, queue.data);
                         }
@@ -141,11 +139,10 @@
          * @param {object} methodTags - list of method tags
          * @param {object} globalTags - list of global tags
          * @param {string} typeTags - list of type tags
-         * @param {string} environment - environment tag value
          * @param {string} app - app tag value
          * @returns {*}
          */
-        this.setTags = function (methodTags, globalTags, typeTags, environment, app) {
+        this.setTags = function (methodTags, globalTags, typeTags, app) {
             var tags = {};
 
             Object.keys(globalTags).forEach(function (key) {
@@ -159,10 +156,6 @@
             Object.keys(methodTags).forEach(function (key) {
                 tags[key] = methodTags[key];
             });
-
-            if (!tags.env && environment) {
-                tags.env = environment;
-            }
 
             if (!tags.app && app) {
                 tags.app = app;

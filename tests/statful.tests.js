@@ -18,7 +18,6 @@ describe('Statful Client Unit testing', function () {
 
         expect(statful.config.dryrun).toEqual(false);
         expect(statful.config.debug).toEqual(false);
-        expect(statful.config.environment).toEqual(undefined);
         expect(statful.config.app).toEqual(undefined);
         expect(statful.config.tags).toEqual({});
         expect(statful.config.aggregations).toEqual([]);
@@ -50,7 +49,7 @@ describe('Statful Client Unit testing', function () {
         var options = {
             tags: {mark: 'gauge'},
             agg: [],
-            agg_freq: 300
+            aggFreq: 300
         };
 
         statful.gauge('test', 1234, options);
@@ -111,7 +110,7 @@ describe('Statful Client Unit testing', function () {
         var options = {
             tags: {mark: 'gauge'},
             agg: ['fail'],
-            agg_freq: 300
+            aggFreq: 300
         };
 
         statful.gauge('test', 1234, options);
@@ -140,7 +139,7 @@ describe('Statful Client Unit testing', function () {
 
         var options = {
             tags: {mark: 'gauge'},
-            agg_freq: 1234
+            aggFreq: 1234
         };
 
         statful.gauge('test', 1234, options);
@@ -282,9 +281,7 @@ describe('Statful Client Unit testing', function () {
     });
 
     it('should call addItemToQueue when registerMeasure with valid metric and default tags/aggregations', function() {
-        statful.initialize({
-            environment: 'production'
-        });
+        statful.initialize();
 
         var util = statful.util;
 
@@ -301,7 +298,7 @@ describe('Statful Client Unit testing', function () {
             name: 'metric_test',
             type: 'timer',
             value: jasmine.any(Number),
-            tags: {mark: 'measure', env: 'production', unit: 'ms'},
+            tags: {mark: 'measure', unit: 'ms'},
             aggregations: ['avg', 'p90', 'count'],
             aggregationFrequency: 10,
             namespace: 'web'
@@ -317,7 +314,7 @@ describe('Statful Client Unit testing', function () {
 
         var options = {
             tags: {mark: 'foo'},
-            aggregations: []
+            agg: []
         };
 
         statful.timer('load', 1234, options);
@@ -380,9 +377,7 @@ describe('Statful Client Unit testing', function () {
     });
 
     it('should call addItemToQueue when gauge with valid metric and default tags/aggregations', function() {
-        statful.initialize({
-            environment: 'production'
-        });
+        statful.initialize();
 
         var util = statful.util;
 
@@ -391,7 +386,7 @@ describe('Statful Client Unit testing', function () {
         var options = {
             tags: {mark: 'gauge'},
             agg: [],
-            agg_freq: 30
+            aggFreq: 30
         };
 
         statful.gauge('test', 1234, options);
@@ -400,7 +395,7 @@ describe('Statful Client Unit testing', function () {
             name: 'test',
             type: 'gauge',
             value:  1234,
-            tags: {mark: 'gauge', env: 'production'},
+            tags: {mark: 'gauge'},
             aggregations: ['last'],
             aggregationFrequency: 30,
             namespace: 'web'

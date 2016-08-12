@@ -45,8 +45,7 @@ After installing Statful Client you are ready to use it. The quickest way is to 
         statful.initialize({
             dryrun: false,
             debug: false,
-            app: 'exampleApp',
-            environment: 'local',
+            app: 'exampleApp',          
             flushInterval: 5000
         });
         
@@ -68,7 +67,6 @@ The custom options that can be set on config param are detailed below.
 | dryRun | Defines if metrics should be output to the logger instead of being send. | `boolean` | `false` | **NO** |
 | debug | Defines logs should be sent to console. | `boolean` | `false` | **NO** |
 | app | Defines the application global name. If specified sets a global tag `app=setValue`. | `string` | **undefined** | **NO** |
-| environment | Defines the environment global name. If specified sets a global tag `environment=setValue`. | `string` | **undefined** | **NO** |
 | namespace | Defines the global namespace. | `string` | `web` | **NO** |
 | flushInterval | Defines the periodicity of buffer flushes in **miliseconds**. | `number` | `10000` | **NO** |
 | timeout | Defines the timeout. | `number` | `2000` | **NO** |
@@ -80,7 +78,7 @@ The custom options that can be set on config param are detailed below.
 ### Methods
 
 ```javascript
-- staful.counter('myCounter', 1, {agg: ['sum']});
+- staful.counter('myCounter', 1, {aggr: ['sum']});
 - staful.gauge('myGauge', 10, { tags: { host: 'localhost' } });
 - staful.timer('myCounter', 200, {namespace: 'sandbox'});
 ```

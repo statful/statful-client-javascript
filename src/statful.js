@@ -9,7 +9,6 @@
      *
      * statful.initialize({
      *      app: 'example-app'
-     *      environment: 'local',
      *      namespace: 'mobile',
      *      dryrun: false,
      *      debug: false
@@ -22,7 +21,6 @@
         dryrun: false,
         debug: false,
         app: undefined,
-        environment: undefined,
         namespace: 'web',
         tags: {},
         aggregations: [],
@@ -82,7 +80,7 @@
                     name: name,
                     type: type,
                     value: value,
-                    tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.environment, self.config.app),
+                    tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.app),
                     aggregations: self.util.setAggregations(aggregations, self.config.aggregations, self.config[type].aggregations),
                     aggregationFrequency: self.util.setAggregationFrequency(aggregationFrequency, self.config.aggregationFrequency, self.config[type].aggregationFrequency),
                     namespace: namespace || self.config.namespace
@@ -96,7 +94,7 @@
 
             // Create Util
             self.util = new StatfulUtil({
-                apiAddress: this.config.apiAddress,
+                apiAddress: this.apiAddress,
                 debug: this.config.debug,
                 dryrun: this.config.dryrun,
                 flushInterval: this.config.flushInterval,
@@ -254,7 +252,7 @@
          * Register timer
          * @param {string} metricName - metric name to be used as metric name
          * @param {number} metricValue - timer value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         timer: function (metricName, metricValue, options) {
             try {
@@ -263,7 +261,7 @@
                     options = options || {};
 
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, 'timer', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, 'timer', metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue('metrics', item);
                 } else {
                     logger.error('Undefined metric name/value to register as a timer');
@@ -277,7 +275,7 @@
          * Register counter
          * @param {string} metricName - metric name to be sent
          * @param {number} metricValue - count value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         counter: function (metricName, metricValue, options) {
             try {
@@ -288,7 +286,7 @@
                     options = options || {};
 
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, 'counter', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, 'counter', metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue('metrics', item);
                 } else {
                     logger.error('Undefined metric name to register as a counter');
@@ -302,7 +300,7 @@
          * Register gauge
          * @param {string} metricName metric name to be sent
          * @param {number} metricValue gauge value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         gauge: function (metricName, metricValue, options) {
             try {
@@ -311,7 +309,7 @@
                     options = options || {};
 
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, 'gauge', metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, 'gauge', metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue('metrics', item);
                 } else {
                     logger.error('Undefined metric name/value to register as a gauge');

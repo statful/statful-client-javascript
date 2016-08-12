@@ -8,33 +8,10 @@ describe('Statful Util Unit testing', function () {
         });
     });
 
-    it('should not send request', function () {
-        spyOn(XMLHttpRequest.prototype, 'send');
-
-
-        statfulUtil.sendRequest('endpoint', 'GET2', '?id=1');
-
-        expect(XMLHttpRequest.prototype.send.calls.count()).toEqual(0);
-    });
-
-
-    it('should to send GET request', function () {
-        jasmine.Ajax.install();
-
-        statfulUtil.sendRequest('endpoint', 'GET', '?id=1');
-
-        var request = jasmine.Ajax.requests.mostRecent();
-
-        expect(request.method).toBe('GET');
-        expect(request.url).toBe('//beacon.statful.com/endpoint/?id=1');
-
-        jasmine.Ajax.uninstall();
-    });
-
     it('should to send POST request', function () {
         jasmine.Ajax.install();
 
-        statfulUtil.sendRequest('endpoint', 'POST', {
+        statfulUtil.sendRequest('endpoint', {
             id: 1
         });
 
@@ -64,7 +41,7 @@ describe('Statful Util Unit testing', function () {
         });
         jasmine.clock().tick(5001);
 
-        expect(statfulUtil.sendRequest).toHaveBeenCalledWith('endpoint', 'POST', '[{"name":"test","type":"counter","value":1}]');
+        expect(statfulUtil.sendRequest).toHaveBeenCalledWith('endpoint', '[{"name":"test","type":"counter","value":1}]');
 
         jasmine.clock().uninstall();
     });

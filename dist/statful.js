@@ -44,30 +44,26 @@
         /**
          * Sends HTTP request to the api
          * @param {string} endpoint - action
-         * @param {string} type - GET /POST
          * @param {string} requestData - request data
          */
-        this.sendRequest = function(endpoint, type, requestData) {
+        this.sendRequest = function(endpoint, requestData) {
             try {
                 var requestArr = [ this.config.apiAddress, endpoint ];
-                var urlParams = type == "GET" ? requestData : null;
-                urlParams ? requestArr.push(urlParams) : null;
                 var requestUrl = requestArr.join("/");
                 logger.debug("Request: " + requestUrl);
                 var xmlHttp = new XMLHttpRequest();
                 xmlHttp.timeout = config.timeout;
-                xmlHttp.open(type, requestUrl, true);
-                switch (type) {
-                  case "POST":
-                    //Send the proper header information along with the request
-                    xmlHttp.setRequestHeader("Content-type", "application/json");
-                    xmlHttp.send(requestData);
-                    break;
-
-                  case "GET":
-                    xmlHttp.send(null);
-                    break;
-                }
+                xmlHttp.open("POST", requestUrl, true);
+                //Send the proper header information along with the request
+                xmlHttp.setRequestHeader("Content-type", "application/json");
+                xmlHttp.send(requestData);
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        logger.debug("Successfully send metric");
+                    } else {
+                        logger.error("Failed to send metric", requestUrl, xmlHttp.status);
+                    }
+                };
             } catch (ex) {
                 logger.error(ex);
             }
@@ -90,7 +86,7 @@
                     var queue = self.listQueues[queueName];
                     if (queue.data.length > 0) {
                         if (!self.config.dryrun) {
-                            self.sendRequest(queue.endpoint, "POST", JSON.stringify(queue.data));
+                            self.sendRequest(queue.endpoint, JSON.stringify(queue.data));
                         } else {
                             logger.debug("Dryrun data", queue.endpoint, queue.data);
                         }
@@ -147,11 +143,10 @@
          * @param {object} methodTags - list of method tags
          * @param {object} globalTags - list of global tags
          * @param {string} typeTags - list of type tags
-         * @param {string} environment - environment tag value
          * @param {string} app - app tag value
          * @returns {*}
          */
-        this.setTags = function(methodTags, globalTags, typeTags, environment, app) {
+        this.setTags = function(methodTags, globalTags, typeTags, app) {
             var tags = {};
             Object.keys(globalTags).forEach(function(key) {
                 tags[key] = globalTags[key];
@@ -162,9 +157,6 @@
             Object.keys(methodTags).forEach(function(key) {
                 tags[key] = methodTags[key];
             });
-            if (!tags.env && environment) {
-                tags.env = environment;
-            }
             if (!tags.app && app) {
                 tags.app = app;
             }
@@ -225,7 +217,6 @@
      *
      * statful.initialize({
      *      app: 'example-app'
-     *      environment: 'local',
      *      namespace: 'mobile',
      *      dryrun: false,
      *      debug: false
@@ -238,7 +229,6 @@
         dryrun: false,
         debug: false,
         app: undefined,
-        environment: undefined,
         namespace: "web",
         tags: {},
         aggregations: [],
@@ -291,7 +281,7 @@
                     name: name,
                     type: type,
                     value: value,
-                    tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.environment, self.config.app),
+                    tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.app),
                     aggregations: self.util.setAggregations(aggregations, self.config.aggregations, self.config[type].aggregations),
                     aggregationFrequency: self.util.setAggregationFrequency(aggregationFrequency, self.config.aggregationFrequency, self.config[type].aggregationFrequency),
                     namespace: namespace || self.config.namespace
@@ -302,7 +292,7 @@
             logger = new StatfulLogger(self.config.debug);
             // Create Util
             self.util = new StatfulUtil({
-                apiAddress: this.config.apiAddress,
+                apiAddress: this.apiAddress,
                 debug: this.config.debug,
                 dryrun: this.config.dryrun,
                 flushInterval: this.config.flushInterval,
@@ -440,7 +430,7 @@
          * Register timer
          * @param {string} metricName - metric name to be used as metric name
          * @param {number} metricValue - timer value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         timer: function(metricName, metricValue, options) {
             try {
@@ -448,7 +438,7 @@
                 if (metricName && metricValue) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "timer", metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, "timer", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name/value to register as a timer");
@@ -461,7 +451,7 @@
          * Register counter
          * @param {string} metricName - metric name to be sent
          * @param {number} metricValue - count value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         counter: function(metricName, metricValue, options) {
             try {
@@ -470,7 +460,7 @@
                 if (metricName) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "counter", metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, "counter", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name to register as a counter");
@@ -483,7 +473,7 @@
          * Register gauge
          * @param {string} metricName metric name to be sent
          * @param {number} metricValue gauge value to be sent
-         * @param {object} options - set of option (tags, aggr, agg_freq, namespace)
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
         gauge: function(metricName, metricValue, options) {
             try {
@@ -491,7 +481,7 @@
                 if (metricName && metricValue) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "gauge", metricValue, options.tags, options.agg, options.agg_freq, options.namespace);
+                    var item = new this.metricsData(metricName, "gauge", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name/value to register as a gauge");
