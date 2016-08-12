@@ -27,9 +27,7 @@ module.exports = function (grunt) {
                 options: {
                     mangle: true,
                     banner: grunt.file.readJSON('package.json').banner,
-                    compress: {
-                        pure_funcs: ['console.log']
-                    },
+                    compress: true,
                     quoteStyle: 1
                 },
                 files: {

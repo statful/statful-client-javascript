@@ -4,47 +4,49 @@
     function StatfulUtil(config) {
         config = config || {};
         var self = this;
+        var logger;
 
         //Merge configs
+        this.config = {};
         Object.keys(config).forEach(function (key) {
-            self[key] = config[key];
+            self.config[key] = config[key];
         });
 
         this.listQueues = [];
 
+        logger = new StatfulLogger(self.config.debug);
+
         /**
          * Sends HTTP request to the api
          * @param {string} endpoint - action
-         * @param {string} type - GET /POST
          * @param {string} requestData - request data
          */
-        this.sendRequest = function (endpoint, type, requestData) {
+        this.sendRequest = function (endpoint, requestData) {
             try {
-                var requestArr = [this.apiAddress, endpoint];
-                var urlParams = type == 'GET' ? requestData : null;
-                urlParams ? requestArr.push(urlParams) : null;
+                var requestArr = [this.config.apiAddress, endpoint];
                 var requestUrl = requestArr.join('/');
 
-                console.log('Request: ' + requestUrl);
-
+                logger.debug('Request: ' + requestUrl);
 
                 var xmlHttp = new XMLHttpRequest();
+                xmlHttp.timeout = config.timeout;
 
-                xmlHttp.open(type, requestUrl, true);
+                xmlHttp.open('POST', requestUrl, true);
 
-                switch (type) {
-                    case 'POST':
-                        //Send the proper header information along with the request
-                        xmlHttp.setRequestHeader('Content-type', 'application/json');
-                        xmlHttp.send(requestData);
-                        break;
-                    case 'GET':
-                        xmlHttp.send(null);
-                        break;
-                }
+                //Send the proper header information along with the request
+                xmlHttp.setRequestHeader('Content-type', 'application/json');
+                xmlHttp.send(requestData);
+
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        logger.debug('Successfully send metric');
+                    } else {
+                        logger.error('Failed to send metric', requestUrl, xmlHttp.status);
+                    }
+                };
             }
             catch (ex) {
-                console.log(ex);
+                logger.error(ex);
             }
         };
 
@@ -55,7 +57,7 @@
          * @param {int} timeInterval - interval in milliseconds, default 30000 ms
          */
         this.registerQueue = function (queueName, endpoint, timeInterval) {
-            timeInterval = timeInterval || this.flushInterval;
+            timeInterval = timeInterval || this.config.flushInterval;
 
             if (typeof queueName === 'string' && typeof timeInterval === 'number') {
                 var self = this;
@@ -68,13 +70,15 @@
                 this.listQueues[queueName].timer = setInterval(function () {
                     var queue = self.listQueues[queueName];
 
-                    if (!self.dryrun && queue.data.length > 0) {
-                        self.sendRequest(queue.endpoint, 'POST', JSON.stringify(queue.data));
-                    } else {
-                        console.log(queue.endpoint, queue.data);
+                    if (queue.data.length > 0) {
+                        if (!self.config.dryrun) {
+                            self.sendRequest(queue.endpoint, JSON.stringify(queue.data));
+                        } else {
+                            logger.debug('Dryrun data', queue.endpoint, queue.data);
+                        }
+                        queue.data = [];
                     }
 
-                    queue.data = [];
                 }, timeInterval);
 
                 return true;
@@ -135,11 +139,10 @@
          * @param {object} methodTags - list of method tags
          * @param {object} globalTags - list of global tags
          * @param {string} typeTags - list of type tags
-         * @param {string} environment - environment tag value
          * @param {string} app - app tag value
          * @returns {*}
          */
-        this.setTags = function (methodTags, globalTags, typeTags, environment, app) {
+        this.setTags = function (methodTags, globalTags, typeTags, app) {
             var tags = {};
 
             Object.keys(globalTags).forEach(function (key) {
@@ -150,25 +153,12 @@
                 tags[key] = typeTags[key];
             });
 
+            Object.keys(methodTags).forEach(function (key) {
+                tags[key] = methodTags[key];
+            });
 
-            if (!methodTags) {
-                tags = tags || {};
-
-                if (environment) {
-                    tags.env = environment;
-                }
-            } else {
-                Object.keys(methodTags).forEach(function (key) {
-                    tags[key] = methodTags[key];
-                });
-
-                if (!tags.env && environment) {
-                    tags.env = environment;
-                }
-
-                if (!tags.app && app) {
-                    tags.app = app;
-                }
+            if (!tags.app && app) {
+                tags.app = app;
             }
 
             return tags;
@@ -200,11 +190,11 @@
          * @returns {Array}
          */
         this.filterAggregations = function (aggregations) {
-            var agg = ['avg', 'count', 'sum', 'first', 'last', 'p90', 'p95', 'min', 'max', 'derivative'];
+            var agg = ['avg', 'count', 'sum', 'first', 'last', 'p90', 'p95', 'min', 'max'];
 
             aggregations = aggregations || [];
 
-            return aggregations.filter(function(item) {
+            return aggregations.filter(function (item) {
                 return agg.indexOf(item) !== -1;
             });
         };
@@ -223,131 +213,6 @@
             }
 
             return freq;
-        };
-
-        /**
-         * Validates if the browser support the resource timing specification
-         * @returns {boolean}
-         */
-        this.isResourceTimingSupported = function () {
-            return !!(window.performance && window.performance.clearResourceTimings);
-        };
-
-        /**
-         * Validates if the resource is considered a DNS/TCP/TLS failure
-         * @param domainLookupStart {number}
-         * @param connectStart {number}
-         * @param requestStart {number}
-         * @param responseStart {number}
-         * @returns {boolean}
-         */
-        this.isResourceFailure = function (domainLookupStart, connectStart, requestStart, responseStart) {
-            return domainLookupStart === 0 || connectStart === 0 || requestStart === 0 || responseStart === 0;
-        };
-
-        /**
-         * Validate if the resource originated from a cross origin request
-         * @param duration {number}
-         * @param fetchStart {number}
-         * @param responseEnd {number}
-         * @returns {boolean}
-         */
-        this.isResourceCrossOrigin = function (duration, fetchStart, responseEnd) {
-            return duration !== 0 && fetchStart !== 0 && responseEnd !== 0;
-        };
-
-        /**
-         * Validate the resource metrics calculated are all valid
-         * @param domainLookup {number}
-         * @param connect {number}
-         * @param ssl {number}
-         * @param request {number}
-         * @param response {number}
-         * @returns {boolean}
-         */
-        this.isResourceTimingComplete = function (domainLookup, connect, ssl, request, response) {
-            return domainLookup !== undefined && connect !== undefined && ssl !== undefined && request !== undefined && response !== undefined;
-        };
-
-        /**
-         * Filter desired resources only
-         * @param typeBlacklist
-         * @param pathFilter
-         * @param resources
-         * @returns {*|Array.<T>}
-         */
-        this.filterResources = function (typeBlacklist, pathFilter, resources) {
-            var filteredResources;
-
-            filteredResources = resources.filter(function filter(entry) {
-                // Exclude blacklisted types
-                if (typeBlacklist.indexOf(entry.initiatorType) === -1) {
-                    // Apply user defined filtering function
-                    try {
-                        return pathFilter(entry.name);
-                    } catch (ex) {
-                        console.log(ex);
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            });
-
-            return filteredResources;
-        };
-
-        /**
-         * Calculate measures based on the resource attribute timers
-         * @param resource
-         * @returns {{}}
-         */
-        this.measureResource = function (resource) {
-            var attributes = {};
-
-            /**
-             * DNS/TCP/TLS failures are represented in IE/Firefox with zero values in most attributes
-             * Chrome does not create a ResourceTiming entry for failures
-             */
-            if (this.isResourceFailure(resource.domainLookupStart, resource.connectStart, resource.requestStart, resource.responseStart)) {
-                if (this.isResourceCrossOrigin(resource.duration, resource.fetchStart, resource.responseEnd)) {
-                    attributes.fetch = resource.responseEnd - resource.fetchStart;
-                    attributes.load = resource.duration;
-                }
-            } else {
-                attributes.fetch = resource.responseEnd - resource.fetchStart;
-                attributes.domainLookup = resource.domainLookupEnd - resource.domainLookupStart;
-                attributes.connect = resource.connectEnd - resource.connectStart;
-                attributes.ssl = resource.secureConnectionStart ? (resource.connectEnd - resource.secureConnectionStart) : 0;
-                attributes.request = resource.responseStart - resource.requestStart;
-                attributes.response = resource.responseEnd - resource.responseStart;
-                attributes.load = resource.duration;
-            }
-
-            return attributes;
-        };
-
-        /**
-         * Builds a tags object based on the resource attributes
-         * @param resource
-         * @param trackResourceName
-
-         * @returns {{}}
-         */
-        this.tagResource = function (resource, trackResourceName) {
-            var tags = {};
-
-            try {
-                tags.initiator = resource.initiatorType;
-
-                if (trackResourceName.hasOwnProperty(tags.initiator)) {
-                    tags.resource = trackResourceName[tags.initiator](resource.name);
-                }
-            } catch (ex) {
-                console.log(ex);
-            }
-
-            return tags;
         };
     }
 

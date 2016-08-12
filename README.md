@@ -1,11 +1,26 @@
 # statful-client-javascript
-Statful client for Javascript applications.
+Staful client for Javascript. This client is intended to gather metrics and send them to Statful.
 
 [![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://travis-ci.org/statful/statful-client-javascript)
 [![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
 
 
-## Install
+## Table of Contents
+
+* [Supported Versions](#supported-versions)
+* [Installation](#installation)
+* [Quick Start](#quick-start)
+* [Reference](#reference)
+* [Authors](#authors)
+* [License](#license)
+
+
+## Supported Versions
+
+It supports every browser that has full support for the ECMAScript 5 specification.
+
+
+## Installation
 
 ```
 bower install --save statful-client-javascript
@@ -18,71 +33,68 @@ npm install --save statful-client-javascript
 ```
 
 
-## Timings
+## Quick Start
 
-All methods that provider timing mechanism are based in the [user-timing](http://www.w3.org/TR/user-timing/) specification.
+After installing Statful Client you are ready to use it. The quickest way is to do the following:
 
-### Configuration parameters
+```javascript
+    <script type="text/javascript" src="bower_components/statful-client-javascript/dist/statful.min.js"></script>
 
-- **dryrun**: enable dryrun mode - ie. do not actually flush metrics out
-- **environment**: environment to be used as tag - ie. development, production, etc.
-- **namespace**: namespace to be used as metrics prefix - ie web, application, mobile, etc.
-- **tags**: global tags
-- **aggregations**: global aggregations
-- **aggregationFrequency**: aggregation frequency
-- **timer, counter, gauge, other**: metric type defaults
-- **registerResourceErrors**: enable resource error tracking
-- **resourceErrorsNameTracking**: track resource names on resource error tracking
-- **resourceErrorsTypeBlacklist**: resource error type blacklist
-- **registerResourceLoading**: enable resource loading tracking
-- **resourceLoadingTrackingInterval**: resource loading tracking interval
-- **resourceLoadingTypeBlacklist**: resource type blacklist
-- **resourceLoadingPathFilter**: resource path whitelist
-- **resourceLoadingNameTracking**: track resource names
-- **flushInterval**: metrics flush interval
-
-### Register metrics
-
-#### Timers
-
-```
-statful.registerTimer('your.timer.metric.name', 100, {
-    tags: {tagKey: 'foo'}
-});
+    <script>    
+        // Init statful       
+        statful.initialize({
+            dryrun: false,
+            debug: false,
+            app: 'exampleApp',          
+            flushInterval: 5000
+        });
+        
+        // Send a metric
+        statful.counter('page_load');
+    </script>
 ```
 
-#### Counters
+## Reference
 
+Detailed reference if you want to take full advantage from Statful.
+
+### Global configuration
+
+The custom options that can be set on config param are detailed below.
+
+| Option | Description | Type | Default | Required |
+|:---|:---|:---|:---|:---|
+| dryRun | Defines if metrics should be output to the logger instead of being send. | `boolean` | `false` | **NO** |
+| debug | Defines logs should be sent to console. | `boolean` | `false` | **NO** |
+| app | Defines the application global name. If specified sets a global tag `app=setValue`. | `string` | **undefined** | **NO** |
+| namespace | Defines the global namespace. | `string` | `web` | **NO** |
+| flushInterval | Defines the periodicity of buffer flushes in **miliseconds**. | `number` | `10000` | **NO** |
+| timeout | Defines the timeout. | `number` | `2000` | **NO** |
+| tags | Defines the global tags. | `object` | `{}` | **NO** |
+| aggregations | Defines the global aggregations. | `object` | `[]` | **NO** |
+| aggregationFrequency | Defines the global aggregation frequency. | `number` | `10` | **NO** |
+
+
+### Methods
+
+```javascript
+- staful.counter('myCounter', 1, {aggr: ['sum']});
+- staful.gauge('myGauge', 10, { tags: { host: 'localhost' } });
+- staful.timer('myCounter', 200, {namespace: 'sandbox'});
 ```
-// Register counters
+These methods receive a metric name and a metric value as arguments and send a counter/gauge/timer metric. If the options parameter is omitted, the default values are used.
+Read the methods options reference bellow to get more information about the default values.
 
-// Increment 1 (default)
-statful.registerCounter('your.counter.metric.name');
+| Option | Description | Type | Default for Counter | Default for Gauge | Default for Timer |
+|:---|:---|:---|:---|:---|:---|
+| agg | Defines the aggregations to be executed. These aggregations are merged with the ones configured globally, including method defaults.<br><br> **Valid Aggregations:** `avg, count, sum, first, last, p90, p95, min, max` | `array` | `['avg', 'p90']` | `[last]` | `['avg', 'p90', 'count']` |
+| aggFreq | Defines the aggregation frequency in **seconds**. It overrides the global aggregation frequency configuration.<br><br> **Valid Aggregation Frequencies:** `10, 30, 60, 120, 180, 300` | `number` | `10` | `10` | `10` |
+| namespace | Defines the namespace of the metric. It overrides the global namespace configuration. | `string` | `web` | `web` | `web` |
+| tags | Defines the tags of the metric. These tags are merged with the ones configured globally, including method defaults. | `object` | `{}` | `{}` | `{ unit: 'ms' }` |
 
-// Increment 5
-statful.registerCounter('your.counter.metric.name', {metricValue: 5});
-
-// Increment 5 with custom tag and aggregation
-statful.registerCounter('your.counter.metric.name', {
-    metricValue: 5,
-    tags: {tagKey: 'foo'},
-    aggregations: ['avg']
-});
-```
-
-#### Gauges
-
-```
-// Register a gauge with custom tag, aggregations and aggregation frequency
-statful.registerGauge('your.gauge.metric.name', 345, {
-    tags: {tagKey: 'foo'},
-    aggregations: ['avg', 'last'],
-    aggregationFrequency: 30
-});
-```
 
 ### User Timing
-
+    
 Support for the [user-timing](http://www.w3.org/TR/user-timing/) specification is available.
 
 #### Performance Mark
@@ -92,7 +104,7 @@ statful.registerMark('mark_start');
 statful.registerMark('mark_end');
 ```
 
-#### Performance Measure sent to Telemetron as a Timer
+#### Performance Measure sent to Statful as a Timer
 
 ```
 // Measure and Timer between two marks
@@ -124,129 +136,18 @@ You can omit both start and end mark names:
 * if startMark is missing it will be measured from the navigationStart event
 * if endMark is missing it will be measured until the current high precision time
 
-### Resource Timing
+## Authors
 
-Support for the [resource-timing](https://www.w3.org/TR/resource-timing/) specification is available and controlled as:
+[Mindera - Software Craft](https://github.com/Mindera)
 
-```
- statful.initialize({    
-    registerResourceLoading: true,    
-    resourceLoadingTrackingInterval: 5000,    
-    resourceLoadingTrackingExclusions: [],    
-    resourceLoadingNameTracking: {}
-    ...
- });
-```
+## License
 
-Please note that not all browsers support the resource timing specification and therefore don't support resource tracking.
+Statful Javascript Client is available under the MIT license. See the [LICENSE](https://raw.githubusercontent.com/statful/statful-client-objc/master/LICENSE) file for more information.
 
-#### Configuration
 
-You can enable or disable resource loading tracking by setting the `registerResourceLoading` attribute accordingly.
 
-A blacklist of resource types can be defined to limit the type of resources tracked by setting the `resourceLoadingTypeBlacklist` attribute. 
-This array should contain define types according to the resource timing specification which at the time are: link, css, script, img, object, subdocument, preflight, xmlhttprequest, svg, other.
 
-You can apply a global resource filtering function based on the resource name by setting the `resourceLoadingPathFilter` attribute. This should be a callback function that receives the resource name and should return true or false to either include or exclude it.
+## Timings
 
-If you want to capture the name of the resources being tracked as a tag you should use the `resourceLoadingNameTracking` attribute.
-
-The way this works is that yu create an attribute in that object matching the initiatorType you want to track the name of and assign it a callback function which returns the parsed.
-
-Example: Let's say you wanted to:
-
-* track the script names
-* remove the revisions of your bundle
-* exclude the external jquery request
-* exclude all img tags
-
-```
-// original resource name is foo.1234asdf.js
-// parsed resource name is foo.js
-var scriptCaptureFunc = function (name) {
-    var captured = /(\w+.)(\w+.)(\w+)$/.exec(name);
-    return captured[1] + captured[3];
-};
-
-// filter everything that's not jquery
-var srcFilterFunc = function (name) {
-   return name !== 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js';
-};
-
-statful.initialize({   
-    registerResourceLoading: true,  
-    resourceLoadingTrackingInterval: 5000,    
-    resourceLoadingTypeBlacklist: ['img'],    
-    resourceLoadingPathFilter: srcFilterFunc,    
-    resourceLoadingNameTracking: {
-      script: scriptCaptureFunc
-    }
-    ...
-});
-```
-#### Cross Origin Requests
-
-To being able to fully track asset loaded using cross origin requests please follow the [specification](https://www.w3.org/TR/resource-timing/#cross-origin-resources).
-
-### Resource Loading Error
-
-Support for the resource loading error specification is available and controlled as:
-
-```
- statful.initialize({    
-    registerResourceErrors: false,  
-    resourceErrorsNameTracking: {},
-    resourceErrorsTypeBlacklist: []
-    ...
- });
-```
-
-**IMPORTANT:** If you want to track errors in every added resource you have to include and configure client, before all other things, in your header.
-
-That is controlled by a metric with name: '<namespace>'.counter.resource.error.
-
-#### Configuration
-
-You can enable or disable resources loading errors tracking by setting the `registerResourceErrors` attribute accordingly.
-
-A blacklist of resource types can be defined to limit the type of resources tracked by setting the `resourceErrorsTypeBlacklist` attribute. 
-This array should use the following available resource types: img, script, link.
-
-If you want to capture a custom name of the resources being tracked as a tag, instead of default behaviour that captures all resource path as a tag (including http://), you should use the `resourceErrorsNameTracking` attribute. The way this works is that you create an attribute in that object matching the resource type you want to track the name of and assign it a callback function which returns the parsed.
-
-Example: Let's say you wanted to:
-- track the resources loading errors
-- remove the revisions of your bundle
-- exclude all img resources
-
-```
-// original resource name is foo.1234asdf.js
-// parsed resource name is foo.js
-var scriptCaptureFunc = function (name) {
-    var captured = /(\w+.)(\w+.)(\w+)$/.exec(name);
-    return captured[1] + captured[3];
-};
-
-statful.initialize({    
-    registerResourceErrors: true,   
-    resourceErrorsNameTracking: {
-      script: scriptCaptureFunc
-    },    
-    resourceErrorsTypeBlacklist: ['img']
-    ...
-});
-```
-
-### Development
-
-```
-// install deps
-$ npm install && bower install
-
-// run watch
-$ grunt dev
-
-// build dist
-$ grunt
-```
+All methods that provider timing mechanism are based in the [user-timing](http://www.w3.org/TR/user-timing/) specification.
 
