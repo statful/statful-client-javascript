@@ -8,6 +8,12 @@
 
         //Merge configs
         this.config = {};
+
+        this.constants = {
+            aggregationList: ['avg', 'count', 'sum', 'first', 'last', 'p90', 'p95', 'min', 'max'],
+            aggregationFrequencyList: [10, 30, 60, 120, 180, 300]
+        };
+
         Object.keys(config).forEach(function (key) {
             self.config[key] = config[key];
         });
@@ -20,30 +26,41 @@
          * Sends HTTP request to the api
          * @param {string} endpoint - action
          * @param {string} requestData - request data
+         * @param {int} retryNumber - retry number
          */
-        this.sendRequest = function (endpoint, requestData) {
+        this.sendRequest = function (endpoint, requestData, retryNumber) {
+            var self = this;
             try {
+                retryNumber = retryNumber || 0;
                 var requestArr = [this.config.apiAddress, endpoint];
                 var requestUrl = requestArr.join('/');
 
-                logger.debug('Request: ' + requestUrl);
+                if (retryNumber < 3) {
+                    logger.debug('Request: ' + requestUrl, requestData);
 
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.timeout = config.timeout;
+                    var xmlHttp = new XMLHttpRequest();
+                    xmlHttp.timeout = config.timeout;
 
-                xmlHttp.open('POST', requestUrl, true);
+                    xmlHttp.open('POST', requestUrl, true);
 
-                //Send the proper header information along with the request
-                xmlHttp.setRequestHeader('Content-type', 'application/json');
-                xmlHttp.send(requestData);
+                    //Send the proper header information along with the request
+                    xmlHttp.setRequestHeader('Content-type', 'application/json');
+                    xmlHttp.send(requestData);
 
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                        logger.debug('Successfully send metric');
-                    } else {
-                        logger.error('Failed to send metric', requestUrl, xmlHttp.status);
-                    }
-                };
+                    xmlHttp.onreadystatechange = function () {
+                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                            logger.debug('Successfully send metric');
+                        } else {
+                            setTimeout(function () {
+                                self.sendRequest(endpoint, requestData, ++retryNumber);
+                            }, 1000);
+
+                            logger.error('Failed to send metric', requestUrl, xmlHttp.status);
+                        }
+                    };
+                } else {
+                    logger.error('Limit retries achieved', requestUrl);
+                }
             }
             catch (ex) {
                 logger.error(ex);
@@ -190,7 +207,7 @@
          * @returns {Array}
          */
         this.filterAggregations = function (aggregations) {
-            var agg = ['avg', 'count', 'sum', 'first', 'last', 'p90', 'p95', 'min', 'max'];
+            var agg = this.constants.aggregationList;
 
             aggregations = aggregations || [];
 
@@ -205,7 +222,7 @@
          * @returns {*}
          */
         this.filterAggregationFrequency = function (frequency) {
-            var frequencyList = [10, 30, 60, 120, 180, 300];
+            var frequencyList = this.constants.aggregationFrequencyList;
             var freq = 10;
 
             if (frequencyList.indexOf(frequency) > -1) {
