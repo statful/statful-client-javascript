@@ -78,7 +78,7 @@ The custom options that can be set on config param are detailed below.
 ### Methods
 
 ```javascript
-- staful.counter('myCounter', 1, {aggr: ['sum']});
+- staful.counter('myCounter', 1, {agg: ['sum']});
 - staful.gauge('myGauge', 10, { tags: { host: 'localhost' } });
 - staful.timer('myCounter', 200, {namespace: 'sandbox'});
 ```
