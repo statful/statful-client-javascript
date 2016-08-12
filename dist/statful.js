@@ -71,7 +71,7 @@
                         } else {
                             setTimeout(function() {
                                 self.sendRequest(endpoint, requestData, ++retryNumber);
-                            }, 500);
+                            }, 1e3);
                             logger.error("Failed to send metric", requestUrl, xmlHttp.status);
                         }
                     };
