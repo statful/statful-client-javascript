@@ -1,5 +1,6 @@
 {
   "name": "statful-client-javascript",
+  "version": "1.1.0",
   "description": "Statful client for Javascript applications",
   "main": "src/statful-client-javascript.js",
   "authors": [

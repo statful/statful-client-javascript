@@ -66,38 +66,8 @@ module.exports = function (grunt) {
                     captureConsole: false
                 }
             }
-        },
-
-        watch: {
-            scripts: {
-                files: ['src/*.js', 'tests/*.js'],
-                tasks: ['test']
-            }
-        },
-
-        bump: {
-            options: {
-                files: ['package.json', 'bower.json'],
-                updateConfigs: [],
-                commit: true,
-                commitMessage: 'Release v%VERSION%',
-                commitFiles: ['package.json', 'bower.json', 'dist/statful.js', 'dist/statful.min.js'],
-                createTag: true,
-                tagName: 'v%VERSION%',
-                tagMessage: 'Version %VERSION%',
-                push: true,
-                pushTo: 'origin',
-                gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
-                globalReplace: false,
-                prereleaseName: false,
-                regExp: false
-            }
         }
     });
-
-    grunt.registerTask('dev', [
-        'watch'
-    ]);
 
     grunt.registerTask('test', [
         'eslint',
@@ -109,10 +79,5 @@ module.exports = function (grunt) {
         'eslint',
         'karma',
         'uglify'
-    ]);
-
-    grunt.registerTask('release', [
-        'default',
-        'bump'
     ]);
 };
