@@ -143,11 +143,3 @@ You can omit both start and end mark names:
 ## License
 
 Statful Javascript Client is available under the MIT license. See the [LICENSE](https://raw.githubusercontent.com/statful/statful-client-objc/master/LICENSE) file for more information.
-
-
-
-
-## Timings
-
-All methods that provider timing mechanism are based in the [user-timing](http://www.w3.org/TR/user-timing/) specification.
-
