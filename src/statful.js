@@ -46,8 +46,9 @@
     var logger;
 
     var statful = {
-        config: {},
-        apiAddress: '//beacon.statful.com',
+        config: {
+            apiAddress: '//beacon.statful.com'
+        },
         endpoints: {
             metrics: 'beacon/metrics'
         },
@@ -94,7 +95,7 @@
 
             // Create Util
             self.util = new StatfulUtil({
-                apiAddress: this.apiAddress,
+                apiAddress: this.config.apiAddress,
                 debug: this.config.debug,
                 dryrun: this.config.dryrun,
                 flushInterval: this.config.flushInterval,
