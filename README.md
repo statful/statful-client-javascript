@@ -136,6 +136,28 @@ You can omit both start and end mark names:
 * if startMark is missing it will be measured from the navigationStart event
 * if endMark is missing it will be measured until the current high precision time
 
+## Development
+
+### Installation
+
+```bash
+$ npm install && bower install
+```
+
+### Tests
+
+```bash
+$ grunt test
+```
+
+### Contribute
+
+Follow the standard *Fork and Pull Request* workflow and:
+
+* Add tests for new feats
+* Make sure the test suite passes
+* Update or add documentation accordingly
+
 ## Authors
 
 [Mindera - Software Craft](https://github.com/Mindera)
