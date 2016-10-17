@@ -266,8 +266,9 @@
     };
     var logger;
     var statful = {
-        config: {},
-        apiAddress: "//beacon.statful.com",
+        config: {
+            apiAddress: "//beacon.statful.com"
+        },
         endpoints: {
             metrics: "beacon/metrics"
         },
@@ -306,7 +307,7 @@
             logger = new StatfulLogger(self.config.debug);
             // Create Util
             self.util = new StatfulUtil({
-                apiAddress: this.apiAddress,
+                apiAddress: this.config.apiAddress,
                 debug: this.config.debug,
                 dryrun: this.config.dryrun,
                 flushInterval: this.config.flushInterval,
@@ -1145,11 +1146,10 @@ if (!Function.prototype.bind) {
         if (typeof this !== "function") {
             throw TypeError("Bind must be called on a function");
         }
-        var slice = [].slice, args = slice.call(arguments, 1), self = this, bound = function() {
-            return self.apply(this instanceof nop ? this : o, args.concat(slice.call(arguments)));
+        var args = Array.prototype.slice.call(arguments, 1), self = this, nop = function() {}, bound = function() {
+            return self.apply(this instanceof nop ? this : o, args.concat(Array.prototype.slice.call(arguments)));
         };
-        function nop() {}
-        nop.prototype = self.prototype;
+        if (this.prototype) nop.prototype = this.prototype;
         bound.prototype = new nop();
         return bound;
     };

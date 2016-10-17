@@ -8,7 +8,7 @@ describe('Statful Client Unit testing', function () {
 
     it('should exist the module statful and have configs', function () {
         expect(statful).not.toBeNull();
-        expect(statful.apiAddress).toEqual('//beacon.statful.com');
+        expect(statful.config.apiAddress).toEqual('//beacon.statful.com');
         expect(statful.endpoints.metrics).toEqual('beacon/metrics');
 
     });
