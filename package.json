@@ -12,6 +12,7 @@
   },
   "author": "Jose Tavares <jose.tavares@mindera.com>",
   "license": "MIT",
+  "main": "dist/statful.min.js",
   "bugs": {
     "url": "https://github.com/statful/statful-client-javascript/issues"
   },
