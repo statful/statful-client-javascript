@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 1.1.1
+* statful-client-javascript 1.1.2
 * Copyright 2016 Statful <https://www.statful.com/>
 */
 (function(window) {
@@ -267,7 +267,7 @@
     var logger;
     var statful = {
         config: {
-            apiAddress: "//beacon.statful.com"
+            apiAddress: "https://beacon.statful.com"
         },
         endpoints: {
             metrics: "beacon/metrics"

@@ -47,7 +47,7 @@
 
     var statful = {
         config: {
-            apiAddress: '//beacon.statful.com'
+            apiAddress: 'https://beacon.statful.com'
         },
         endpoints: {
             metrics: 'beacon/metrics'
