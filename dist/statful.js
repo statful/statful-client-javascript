@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 1.1.2
+* statful-client-javascript 1.1.3
 * Copyright 2016 Statful <https://www.statful.com/>
 */
 (function(window) {
