@@ -48,7 +48,7 @@
                     xmlHttp.send(requestData);
 
                     xmlHttp.onreadystatechange = function () {
-                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        if (xmlHttp.status == 200) {
                             logger.debug('Successfully send metric');
                         } else {
                             setTimeout(function () {
