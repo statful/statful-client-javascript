@@ -61,7 +61,8 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 300,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
         });
     });
 
@@ -91,7 +92,40 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 60,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
+        });
+    });
+
+    it('should override sample rate by type over global', function() {
+        statful.initialize({
+            tags: {},
+            aggregations: ['last'],
+            timer: {tags: {foo: 'bar'}},
+            gauge: {tags: {meh: 'yep'}, aggregations: [], aggregationFrequency: 60}
+        });
+
+        var util = statful.util;
+
+        spyOn(util, 'addItemToQueue');
+
+        var options = {
+            tags: {mark: 'gauge'},
+            agg: [],
+            sampleRate: 50
+        };
+
+        statful.gauge('test', 1234, options);
+
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
+            name: 'test',
+            type: 'gauge',
+            value:  1234,
+            tags: {mark: 'gauge', meh: 'yep'},
+            aggregations: ['last'],
+            aggregationFrequency: 60,
+            namespace: 'web',
+            sampleRate: 50
         });
     });
 
@@ -122,7 +156,8 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 300,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
         });
     });
 
@@ -151,7 +186,8 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: [],
             aggregationFrequency: 10,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
         });
     });
 
@@ -301,7 +337,8 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'measure', unit: 'ms'},
             aggregations: ['avg', 'p90', 'count'],
             aggregationFrequency: 10,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
         });
     });
 
@@ -398,7 +435,8 @@ describe('Statful Client Unit testing', function () {
             tags: {mark: 'gauge'},
             aggregations: ['last'],
             aggregationFrequency: 30,
-            namespace: 'web'
+            namespace: 'web',
+            sampleRate: 100
         });
     });
 });

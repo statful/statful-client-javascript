@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 1.1.5
+* statful-client-javascript 1.1.6
 * Copyright 2016 Statful <https://www.statful.com/>
 */
 (function(window) {
@@ -128,8 +128,13 @@
          * @param {object} item - object to be sent
          */
         this.addItemToQueue = function(queueName, item) {
-            if (this.listQueues[queueName]) {
+            var sampleRateNormalized = (item.sampleRate || this.config.sampleRate || 100) / 100;
+            if (this.listQueues[queueName] && Math.random() <= sampleRateNormalized) {
                 this.listQueues[queueName].data.push(item);
+                return true;
+            } else {
+                logger.debug("Metric was discarded due to sample rate.");
+                return false;
             }
         };
         /**
@@ -262,7 +267,8 @@
             aggregations: [ "last" ]
         },
         timeout: 2e3,
-        flushInterval: 1e4
+        flushInterval: 1e4,
+        sampleRate: 100
     };
     var logger;
     var statful = {
@@ -291,7 +297,7 @@
                     self.config[key] = clientConfig[key];
                 });
             };
-            self.metricsData = function(name, type, value, tags, aggregations, aggregationFrequency, namespace) {
+            self.metricsData = function(name, type, value, tags, aggregations, aggregationFrequency, namespace, sampleRate) {
                 return {
                     name: name,
                     type: type,
@@ -299,7 +305,8 @@
                     tags: self.util.setTags(tags || {}, self.config.tags, self.config[type].tags, self.config.app),
                     aggregations: self.util.setAggregations(aggregations, self.config.aggregations, self.config[type].aggregations),
                     aggregationFrequency: self.util.setAggregationFrequency(aggregationFrequency, self.config.aggregationFrequency, self.config[type].aggregationFrequency),
-                    namespace: namespace || self.config.namespace
+                    namespace: namespace || self.config.namespace,
+                    sampleRate: sampleRate || self.config.sampleRate
                 };
             };
             this.mergeConfigs(clientConfig);
@@ -424,7 +431,7 @@
                     var time = this.measureTimeUserTiming(measureName);
                     if (time) {
                         // Push metrics to queue
-                        this.util.addItemToQueue("metrics", new this.metricsData(metricName, "timer", time, defaults.tags, defaults.aggregations, defaults.aggregationFrequency));
+                        this.util.addItemToQueue("metrics", new this.metricsData(metricName, "timer", time, defaults.tags, defaults.aggregations, defaults.aggregationFrequency, defaults.namespace, defaults.sampleRate));
                     } else {
                         logger.error("Failed to get measure time to register as timer value");
                     }
@@ -453,7 +460,7 @@
                 if (metricName && metricValue) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "timer", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
+                    var item = new this.metricsData(metricName, "timer", metricValue, options.tags, options.agg, options.aggFreq, options.namespace, options.sampleRate);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name/value to register as a timer");
@@ -475,7 +482,7 @@
                 if (metricName) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "counter", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
+                    var item = new this.metricsData(metricName, "counter", metricValue, options.tags, options.agg, options.aggFreq, options.namespace, options.sampleRate);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name to register as a counter");
@@ -496,7 +503,7 @@
                 if (metricName && metricValue) {
                     options = options || {};
                     // Push metrics to queue
-                    var item = new this.metricsData(metricName, "gauge", metricValue, options.tags, options.agg, options.aggFreq, options.namespace);
+                    var item = new this.metricsData(metricName, "gauge", metricValue, options.tags, options.agg, options.aggFreq, options.namespace, options.sampleRate);
                     this.util.addItemToQueue("metrics", item);
                 } else {
                     logger.error("Undefined metric name/value to register as a gauge");

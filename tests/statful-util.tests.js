@@ -4,7 +4,8 @@ describe('Statful Util Unit testing', function () {
     beforeEach(function () {
         statfulUtil= new StatfulUtil({
             apiAddress: '//beacon.statful.com',
-            flushInterval: 30000
+            flushInterval: 30000,
+            sampleRate: 100
         });
     });
 
@@ -124,4 +125,33 @@ describe('Statful Util Unit testing', function () {
         expect(statfulUtil.listQueues.length).toEqual(0);
     });
 
+    it('should not add items to queue (sample rate)', function () {
+        expect(statfulUtil.listQueues.length).toEqual(0);
+
+        expect(statfulUtil.registerQueue('metrics', 'endpoint', 5000)).toEqual(true);
+
+        spyOn(Math, 'random').and.returnValue(0.5);
+
+        expect(statfulUtil.addItemToQueue('metrics', {
+            name: 'test',
+            type: 'counter',
+            value: 1,
+            sampleRate: 40
+        })).toBeFalsy();
+    });
+
+    it('should add items to queue (sample rate)', function () {
+        expect(statfulUtil.listQueues.length).toEqual(0);
+
+        expect(statfulUtil.registerQueue('metrics', 'endpoint', 5000)).toEqual(true);
+
+        spyOn(Math, 'random').and.returnValue(0.5);
+
+        expect(statfulUtil.addItemToQueue('metrics', {
+            name: 'test',
+            type: 'counter',
+            value: 1,
+            sampleRate: 60
+        })).toBeTruthy();
+    });
 });

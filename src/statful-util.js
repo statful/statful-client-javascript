@@ -121,8 +121,14 @@
          * @param {object} item - object to be sent
          */
         this.addItemToQueue = function (queueName, item) {
-            if (this.listQueues[queueName]) {
+            var sampleRateNormalized = (item.sampleRate || this.config.sampleRate || 100) / 100;
+
+            if (this.listQueues[queueName] && Math.random() <= sampleRateNormalized) {
                 this.listQueues[queueName].data.push(item);
+                return true;
+            } else {
+                logger.debug('Metric was discarded due to sample rate.');
+                return false;
             }
         };
 
