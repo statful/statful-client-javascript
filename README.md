@@ -68,6 +68,7 @@ The custom options that can be set on config param are detailed below.
 | debug | Defines logs should be sent to console. | `boolean` | `false` | **NO** |
 | app | Defines the application global name. If specified sets a global tag `app=setValue`. | `string` | **undefined** | **NO** |
 | namespace | Defines the global namespace. | `string` | `web` | **NO** |
+| sampleRate | Defines the rate sampling. **Should be a number between [1, 100]**. | `number` | `100` | **NO** |
 | flushInterval | Defines the periodicity of buffer flushes in **miliseconds**. | `number` | `10000` | **NO** |
 | timeout | Defines the timeout. | `number` | `2000` | **NO** |
 | tags | Defines the global tags. | `object` | `{}` | **NO** |
