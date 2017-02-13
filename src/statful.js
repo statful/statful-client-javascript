@@ -260,14 +260,14 @@
         timer: function (metricName, metricValue, options) {
             try {
                 logger.debug('Register Timer', metricName, metricValue, options);
-                if (metricName && metricValue) {
+                if (metricName && metricValue >= 0) {
                     options = options || {};
 
                     // Push metrics to queue
                     var item = new this.metricsData(metricName, 'timer', metricValue, options.tags, options.agg, options.aggFreq, options.namespace, options.sampleRate);
                     this.util.addItemToQueue('metrics', item);
                 } else {
-                    logger.error('Undefined metric name/value to register as a timer');
+                    logger.error('Undefined metric name or invalid value to register as a timer');
                 }
             } catch (ex) {
                 logger.error(ex);
