@@ -1,7 +1,8 @@
 /**
-* statful-client-javascript 1.1.8
-* Copyright 2016 Statful <https://www.statful.com/>
+* statful-client-javascript 1.1.9
+* Copyright 2017 Statful <https://www.statful.com/>
 */
+
 (function(window) {
     "use strict";
     function Logger(enableDebug) {
@@ -49,38 +50,24 @@
          * Sends HTTP request to the api
          * @param {string} endpoint - action
          * @param {string} requestData - request data
-         * @param {int} retryNumber - retry number
          */
-        this.sendRequest = function(endpoint, requestData, retryNumber) {
-            var self = this;
-            try {
-                retryNumber = retryNumber || 0;
-                var requestArr = [ this.config.apiAddress, endpoint ];
-                var requestUrl = requestArr.join("/");
-                if (retryNumber < 3) {
-                    logger.debug("Request: " + requestUrl, requestData);
-                    var xmlHttp = new XMLHttpRequest();
-                    xmlHttp.timeout = config.timeout;
-                    xmlHttp.open("POST", requestUrl, true);
-                    //Send the proper header information along with the request
-                    xmlHttp.setRequestHeader("Content-type", "application/json");
-                    xmlHttp.send(requestData);
-                    xmlHttp.onreadystatechange = function() {
-                        if (xmlHttp.status == 200) {
-                            logger.debug("Successfully send metric");
-                        } else {
-                            setTimeout(function() {
-                                self.sendRequest(endpoint, requestData, ++retryNumber);
-                            }, 1e3);
-                            logger.error("Failed to send metric", requestUrl, xmlHttp.status);
-                        }
-                    };
+        this.sendRequest = function(endpoint, requestData) {
+            var requestArr = [ this.config.apiAddress, endpoint ];
+            var requestUrl = requestArr.join("/");
+            logger.debug("Request: " + requestUrl, requestData);
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.timeout = config.timeout;
+            xmlHttp.open("POST", requestUrl, true);
+            //Send the proper header information along with the request
+            xmlHttp.setRequestHeader("Content-type", "application/json");
+            xmlHttp.send(requestData);
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.status == 200 || xmlHttp.status == 201) {
+                    logger.debug("Successfully send metric");
                 } else {
-                    logger.error("Limit retries achieved", requestUrl);
+                    logger.debug("Error send metric", requestUrl, xmlHttp.status);
                 }
-            } catch (ex) {
-                logger.error(ex);
-            }
+            };
         };
         /**
          * Register a new queue

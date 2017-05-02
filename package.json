@@ -1,8 +1,8 @@
 {
   "name": "statful-client-javascript",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Statful client for Javascript applications",
-  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2016 Statful <https://www.statful.com/>\n*/\n",
+  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
     "test": "grunt test"
   },
@@ -18,16 +18,16 @@
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
-    "grunt": "~1.0.0",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-uglify": "^2.0.0",
+    "grunt": "~1.0.1",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-uglify": "^2.3.0",
     "grunt-eslint": "^19.0.0",
     "grunt-karma": "^2.0.0",
-    "jasmine-core": "^2.4.1",
-    "karma": "^1.1.2",
+    "jasmine-core": "^2.6.1",
+    "karma": "^1.6.0",
     "karma-coverage": "^1.1.1",
-    "karma-jasmine": "^1.0.2",
-    "karma-phantomjs-launcher": "^1.0.1",
-    "load-grunt-tasks": "^3.5.0"
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "load-grunt-tasks": "^3.5.2"
   }
 }
