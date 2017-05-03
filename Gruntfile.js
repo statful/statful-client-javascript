@@ -74,8 +74,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('default', [
         'clean',
-        'eslint',
-        'karma',
+        'test',
         'uglify'
     ]);
 };
