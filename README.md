@@ -124,7 +124,7 @@ statful.registerMeasure('measure_name', 'metric_name' options);
 ```
 
 ```
-// Measure and Timer from the navigationStart eent until the current time
+// Measure and Timer from the navigationStart event until the current time
 
 var options = {
     tags: {mark: my_tag}
