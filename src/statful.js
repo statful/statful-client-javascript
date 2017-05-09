@@ -33,7 +33,7 @@
         },
         counter: {
             tags: {},
-            aggregations: ['avg', 'p90']
+            aggregations: ['sum', 'count']
         },
         gauge: {
             tags: {},
