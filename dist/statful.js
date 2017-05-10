@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 1.1.9
+* statful-client-javascript 2.0.0
 * Copyright 2017 Statful <https://www.statful.com/>
 */
 
@@ -247,7 +247,7 @@
         },
         counter: {
             tags: {},
-            aggregations: [ "avg", "p90" ]
+            aggregations: [ "sum", "count" ]
         },
         gauge: {
             tags: {},

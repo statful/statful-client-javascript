@@ -28,7 +28,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.config.timer.aggregations).toEqual(['avg', 'p90', 'count']);
 
         expect(statful.config.counter.tags).toEqual({});
-        expect(statful.config.counter.aggregations).toEqual(['avg', 'p90']);
+        expect(statful.config.counter.aggregations).toEqual(['sum', 'count']);
 
         expect(statful.config.gauge.tags).toEqual({});
         expect(statful.config.gauge.aggregations).toEqual(['last']);
