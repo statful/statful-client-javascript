@@ -34,9 +34,8 @@
             logger.debug('Request: ' + requestUrl, requestData);
 
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.timeout = config.timeout;
-
             xmlHttp.open('POST', requestUrl, true);
+            xmlHttp.timeout = config.timeout;
 
             //Send the proper header information along with the request
             xmlHttp.setRequestHeader('Content-type', 'application/json');
