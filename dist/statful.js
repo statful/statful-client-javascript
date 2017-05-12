@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 2.0.0
+* statful-client-javascript 2.0.1
 * Copyright 2017 Statful <https://www.statful.com/>
 */
 
@@ -56,8 +56,8 @@
             var requestUrl = requestArr.join("/");
             logger.debug("Request: " + requestUrl, requestData);
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.timeout = config.timeout;
             xmlHttp.open("POST", requestUrl, true);
+            xmlHttp.timeout = config.timeout;
             //Send the proper header information along with the request
             xmlHttp.setRequestHeader("Content-type", "application/json");
             xmlHttp.send(requestData);
