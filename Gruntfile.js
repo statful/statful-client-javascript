@@ -5,16 +5,12 @@ module.exports = function (grunt) {
 
         pkg: grunt.file.readJSON('package.json'),
 
-        options: {
-            configFile: 'eslint.json'
-        },
-
         eslint: {
-            options: {
-                configFile: 'eslint.json'
-            },
             js: {
-                src: ['src/**/*.js']
+                src: [
+                  'src/**/*.js',
+                  'tests/*.tests.js',
+                ]
             }
         },
 
