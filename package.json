@@ -4,7 +4,13 @@
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
-    "test": "grunt test"
+    "eslint": "eslint .",
+    "karma": "karma start",
+    "uglify": "uglifyjs --compress --mangle -o dist/statful.min.js -- src/*.js bower_components/usertiming/dist/usertiming.min.js bower_components/js-polyfills/es5.js",
+    "concat": "uglifyjs --beautify -o dist/statful.js -- src/*.js bower_components/usertiming/dist/usertiming.min.js bower_components/js-polyfills/es5.js",
+    "banner": "banner-cli dist/statful.js && banner-cli dist/statful.min.js",
+    "test": "npm run eslint && npm run karma",
+    "build": "npm run concat && npm run uglify && npm run banner"
   },
   "repository": {
     "type": "git",
@@ -18,16 +24,13 @@
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
-    "grunt": "~1.0.1",
-    "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-uglify": "^2.3.0",
-    "grunt-eslint": "^19.0.0",
-    "grunt-karma": "^2.0.0",
+    "banner-cli": "^0.11.0",
+    "eslint": "^4.2.0",
     "jasmine-core": "^2.6.1",
     "karma": "^1.6.0",
     "karma-coverage": "^1.1.1",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
-    "load-grunt-tasks": "^3.5.2"
+    "uglify-js": "^3.0.25"
   }
 }
