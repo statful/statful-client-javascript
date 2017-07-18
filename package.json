@@ -4,6 +4,7 @@
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
+    "build": "NODE_ENV=production rollup -c",
     "test": "grunt test"
   },
   "repository": {
@@ -13,6 +14,7 @@
   "author": "Jose Tavares <jose.tavares@mindera.com>",
   "license": "MIT",
   "main": "dist/statful.js",
+  "browser": "dist/statful.umd.js",
   "bugs": {
     "url": "https://github.com/statful/statful-client-javascript/issues"
   },
@@ -30,6 +32,12 @@
     "karma-coverage": "^1.1.1",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
-    "load-grunt-tasks": "^3.5.2"
+    "karma-rollup-preprocessor": "^4.0.1",
+    "load-grunt-tasks": "^3.5.2",
+    "rollup": "^0.45.2",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-filesize": "^1.4.2",
+    "rollup-plugin-license": "^0.4.0",
+    "rollup-plugin-uglify": "^2.0.1"
   }
 }
