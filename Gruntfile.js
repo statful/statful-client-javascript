@@ -31,11 +31,7 @@ module.exports = function (grunt) {
                     quoteStyle: 1
                 },
                 files: {
-                    'dist/statful.min.js': [
-                        'src/*.js',
-                        'bower_components/usertiming/src/usertiming.js',
-                        'bower_components/js-polyfills/es5.js'
-                    ]
+                    'dist/statful.min.js': [ 'src/*.js' ]
                 }
             },
             debug: {
@@ -47,11 +43,7 @@ module.exports = function (grunt) {
                     banner: grunt.file.readJSON('package.json').banner
                 },
                 files: {
-                    'dist/statful.js': [
-                        'src/*.js',
-                        'bower_components/usertiming/src/usertiming.js',
-                        'bower_components/js-polyfills/es5.js'
-                    ]
+                    'dist/statful.js': [ 'src/*.js' ]
                 }
             }
         },

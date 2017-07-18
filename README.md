@@ -27,7 +27,7 @@ bower install --save statful-client-javascript
 ```
 
 or
- 
+
 ```
 npm install --save statful-client-javascript
 ```
@@ -48,7 +48,7 @@ After installing Statful Client you are ready to use it. The quickest way is to 
             app: 'exampleApp',          
             flushInterval: 5000
         });
-        
+
         // Send a metric
         statful.counter('page_load');
     </script>
@@ -96,8 +96,18 @@ Read the methods options reference bellow to get more information about the defa
 
 
 ### User Timing
-    
+
 Support for the [user-timing](http://www.w3.org/TR/user-timing/) specification is available.
+As long as the browser also supports it.
+You can check the current compatibility table [here](https://caniuse.com/#feat=user-timing).
+If you need to support browsers that do not yet have the user-timing API, you can include the [browser polyfill](https://github.com/nicjansma/usertiming.js) before the statful script.
+
+e.g.:
+
+```javascript
+    <script type="text/javascript" src="bower_components/usertiming/dist/usertiming.min.js"></script>
+    <script type="text/javascript" src="bower_components/statful-client-javascript/dist/statful.min.js"></script>
+```
 
 #### Performance Mark
 
