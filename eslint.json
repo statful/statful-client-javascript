@@ -1,4 +1,8 @@
 {
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
     "globals": {
         "StatfulUtil": true,
         "StatfulLogger": true,
