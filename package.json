@@ -4,7 +4,7 @@
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
-    "eslint": "eslint .",
+    "eslint": "eslint -c eslint.json src/*.js",
     "karma": "karma start",
     "uglify": "uglifyjs --compress --mangle -o dist/statful.min.js -- src/*.js bower_components/usertiming/dist/usertiming.min.js bower_components/js-polyfills/es5.js",
     "concat": "uglifyjs --beautify -o dist/statful.js -- src/*.js bower_components/usertiming/dist/usertiming.min.js bower_components/js-polyfills/es5.js",
