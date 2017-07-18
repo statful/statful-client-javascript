@@ -14,9 +14,7 @@ module.exports = function (config) {
                 {pattern: 'bower_components/usertiming/src/usertiming.js', include: true},
                 {pattern: 'bower_components/js-polyfills/es5.js', include: true},
                 {pattern: 'bower_components/js-polyfills/xhr.js', include: true},
-                {pattern: 'src/logger.js', included: true},
-                {pattern: 'src/statful.js', included: true},
-                {pattern: 'src/statful-util.js', included: true},
+                {pattern: 'src/*.js', included: false},
                 {pattern: 'tests/mock-ajax.js', included: true},
                 {pattern: 'tests/*.tests.js', included: true}
             ],
@@ -33,7 +31,17 @@ module.exports = function (config) {
                 // source files, that you wanna generate coverage for
                 // do not include tests or libraries
                 // (these files will be instrumented by Istanbul)
-                'src/*.js': ['coverage']
+                'src/*.js': ['rollup', 'coverage'],
+                'tests/*.tests.js': ['rollup']
+            },
+
+            rollupPreprocessor: {
+                plugins: [
+                    require('rollup-plugin-babel')(),
+                ],
+                format: 'iife',               // Helps prevent naming collisions.
+                moduleName: 'statful', // Required for 'iife' format.
+                sourceMap: 'inline',          // Sensible for testing.
             },
 
             coverageReporter: {
@@ -67,4 +75,3 @@ module.exports = function (config) {
         }
     );
 };
-
