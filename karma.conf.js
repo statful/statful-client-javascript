@@ -9,17 +9,17 @@ module.exports = function (config) {
             // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
             frameworks: ['jasmine'],
 
-            // list of files / patterns to load in the browser (order matters)
-            files: [
-                {pattern: 'bower_components/usertiming/src/usertiming.js', include: true},
-                {pattern: 'bower_components/js-polyfills/es5.js', include: true},
-                {pattern: 'bower_components/js-polyfills/xhr.js', include: true},
-                {pattern: 'src/logger.js', included: true},
-                {pattern: 'src/statful.js', included: true},
-                {pattern: 'src/statful-util.js', included: true},
-                {pattern: 'tests/mock-ajax.js', included: true},
-                {pattern: 'tests/*.tests.js', included: true}
-            ],
+        // list of files / patterns to load in the browser (order matters)
+        files: [
+            {pattern: 'bower_components/usertiming/src/usertiming.js', include: true},
+            {pattern: 'bower_components/js-polyfills/es5.js', include: true},
+            {pattern: 'bower_components/js-polyfills/xhr.js', include: true},
+            {pattern: 'src/logger.js', included: true},
+            {pattern: 'src/statful.js', included: true},
+            {pattern: 'src/statful-util.js', included: true},
+            {pattern: 'node_modules/jasmine-ajax/lib/mock-ajax.js', included: true},
+            {pattern: 'tests/*.tests.js', included: true}
+        ],
 
             // list of files to exclude
             exclude: [],
