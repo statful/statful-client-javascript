@@ -36,7 +36,6 @@
     "load-grunt-tasks": "^3.5.2",
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-filesize": "^1.4.2",
     "rollup-plugin-license": "^0.4.0",
     "rollup-plugin-uglify": "^2.0.1"
   }
