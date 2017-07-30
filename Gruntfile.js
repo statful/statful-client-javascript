@@ -29,8 +29,8 @@ module.exports = function (grunt) {
                 files: {
                     'dist/statful.min.js': [
                         'src/*.js',
-                        'bower_components/usertiming/src/usertiming.js',
-                        'bower_components/js-polyfills/es5.js'
+                        require.resolve('usertiming/src/usertiming.js'),
+                        require.resolve('js-polyfills/es5.js')
                     ]
                 }
             },
@@ -45,8 +45,8 @@ module.exports = function (grunt) {
                 files: {
                     'dist/statful.js': [
                         'src/*.js',
-                        'bower_components/usertiming/src/usertiming.js',
-                        'bower_components/js-polyfills/es5.js'
+                        require.resolve('usertiming/src/usertiming.js'),
+                        require.resolve('js-polyfills/es5.js')
                     ]
                 }
             }
