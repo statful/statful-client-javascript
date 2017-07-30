@@ -24,10 +24,12 @@
     "grunt-eslint": "^19.0.0",
     "grunt-karma": "^2.0.0",
     "jasmine-core": "^2.6.1",
+    "js-polyfills": "^0.1.33",
     "karma": "^1.6.0",
     "karma-coverage": "^1.1.1",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
-    "load-grunt-tasks": "^3.5.2"
+    "load-grunt-tasks": "^3.5.2",
+    "usertiming": "^0.1.8"
   }
 }
