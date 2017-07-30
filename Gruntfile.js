@@ -8,8 +8,8 @@ module.exports = function (grunt) {
         eslint: {
             js: {
                 src: [
-                  'src/**/*.js',
-                  'tests/*.tests.js',
+                    'src/**/*.js',
+                    'tests/*.tests.js',
                 ]
             }
         },

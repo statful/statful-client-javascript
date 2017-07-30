@@ -20,7 +20,7 @@ module.exports = function (config) {
             {pattern: 'src/statful-util.js', included: true},
             {pattern: 'tests/*.tests.js', included: true}
         ],
-            
+
         // list of files to exclude
         exclude: [],
 
