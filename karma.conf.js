@@ -11,9 +11,9 @@ module.exports = function (config) {
 
             // list of files / patterns to load in the browser (order matters)
             files: [
-                {pattern: 'bower_components/usertiming/src/usertiming.js', include: true},
-                {pattern: 'bower_components/js-polyfills/es5.js', include: true},
-                {pattern: 'bower_components/js-polyfills/xhr.js', include: true},
+                {pattern: require.resolve('usertiming/src/usertiming.js'), include: true},
+                {pattern: require.resolve('js-polyfills/es5.js'), include: true},
+                {pattern: require.resolve('js-polyfills/xhr.js'), include: true},
                 {pattern: 'src/*.js', included: false},
                 {pattern: 'tests/mock-ajax.js', included: true},
                 {pattern: 'tests/*.tests.js', included: true}

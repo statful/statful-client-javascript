@@ -13,10 +13,5 @@
     "node_modules",
     "bower_components",
     "tests"
-  ],
-  "dependencies": {},
-  "devDependencies": {
-    "usertiming": "^0.1.8",
-    "js-polyfills": "^0.1.33"
-  }
+  ]
 }
