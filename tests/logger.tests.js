@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+import StatfulLogger from '../src/logger';
+
 describe('Statful Logger Unit testing', function () {
     var logger;
 

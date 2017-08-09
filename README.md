@@ -159,7 +159,7 @@ $ npm install && bower install
 ### Tests
 
 ```bash
-$ grunt test
+$ npm test
 ```
 
 ### Contribute
