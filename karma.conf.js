@@ -11,10 +11,7 @@ module.exports = function(config) {
         //
         // list of files / patterns to load in the browser (order matters)
         files: [
-            {
-                pattern: require.resolve('usertiming/src/usertiming.js'),
-                include: true
-            },
+            { pattern: require.resolve('usertiming'), include: false },
             { pattern: require.resolve('jasmine-ajax'), include: true },
             { pattern: 'src/*.js', included: false },
             { pattern: 'tests/*.tests.js', included: true }
@@ -37,7 +34,10 @@ module.exports = function(config) {
         },
 
         rollupPreprocessor: {
-            plugins: [require('rollup-plugin-babel')()],
+            plugins: [
+                require('rollup-plugin-node-resolve')(),
+                require('rollup-plugin-babel')()
+            ],
             format: 'iife', // Helps prevent naming collisions.
             moduleName: 'statful', // Required for 'iife' format.
             sourceMap: 'inline' // Sensible for testing.

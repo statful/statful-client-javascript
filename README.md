@@ -98,16 +98,7 @@ Read the methods options reference bellow to get more information about the defa
 ### User Timing
 
 Support for the [user-timing](http://www.w3.org/TR/user-timing/) specification is available.
-As long as the browser also supports it.
 You can check the current compatibility table [here](https://caniuse.com/#feat=user-timing).
-If you need to support browsers that do not yet have the user-timing API, you can include the [browser polyfill](https://github.com/nicjansma/usertiming.js) before the statful script.
-
-e.g.:
-
-```javascript
-    <script type="text/javascript" src="bower_components/usertiming/dist/usertiming.min.js"></script>
-    <script type="text/javascript" src="bower_components/statful-client-javascript/dist/statful.min.js"></script>
-```
 
 #### Performance Mark
 
