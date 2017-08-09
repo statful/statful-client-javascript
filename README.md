@@ -98,6 +98,7 @@ Read the methods options reference bellow to get more information about the defa
 ### User Timing
 
 Support for the [user-timing](http://www.w3.org/TR/user-timing/) specification is available.
+You can check the current compatibility table [here](https://caniuse.com/#feat=user-timing).
 
 #### Performance Mark
 

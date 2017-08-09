@@ -2,11 +2,13 @@ import pkg from './package.json';
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
 import license from 'rollup-plugin-license';
+import resolve from 'rollup-plugin-node-resolve';
 
 const defaults = {
     entry: 'src/statful.js',
     moduleName: 'statful',
     plugins: [
+        resolve(),
         babel(),
         license({
             sourceMap: true,

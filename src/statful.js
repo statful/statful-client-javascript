@@ -1,3 +1,4 @@
+import 'usertiming';
 import StatfulLogger from './logger';
 import StatfulUtil from './statful-util';
 
