@@ -27,7 +27,7 @@ bower install --save statful-client-javascript
 ```
 
 or
- 
+
 ```
 npm install --save statful-client-javascript
 ```
@@ -48,7 +48,7 @@ After installing Statful Client you are ready to use it. The quickest way is to 
             app: 'exampleApp',          
             flushInterval: 5000
         });
-        
+
         // Send a metric
         statful.counter('page_load');
     </script>
@@ -96,7 +96,7 @@ Read the methods options reference bellow to get more information about the defa
 
 
 ### User Timing
-    
+
 Support for the [user-timing](http://www.w3.org/TR/user-timing/) specification is available.
 
 #### Performance Mark
@@ -149,7 +149,7 @@ $ npm install && bower install
 ### Tests
 
 ```bash
-$ grunt test
+$ npm test
 ```
 
 ### Contribute

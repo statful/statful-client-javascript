@@ -31,7 +31,7 @@ describe('Statful Util Unit testing', function () {
         jasmine.Ajax.uninstall();
     });
 
-    it("should register a new Queue and send data", function () {
+    it('should register a new Queue and send data', function () {
         jasmine.clock().install();
         spyOn(statfulUtil, 'sendRequest');
 
@@ -49,15 +49,15 @@ describe('Statful Util Unit testing', function () {
         jasmine.clock().uninstall();
     });
 
-    it("should register a new Queue without interval expect default timer 30000", function () {
+    it('should register a new Queue without interval expect default timer 30000', function () {
         expect(statfulUtil.registerQueue('metrics', 'endpoint')).toEqual(true);
     });
 
-    it("should not register a new Queue invalid inputs", function () {
+    it('should not register a new Queue invalid inputs', function () {
         expect(statfulUtil.registerQueue([], 'endpoint')).toEqual(false);
     });
 
-    it("should register a new Queue and not send data", function () {
+    it('should register a new Queue and not send data', function () {
         jasmine.clock().install();
 
         statfulUtil= new StatfulUtil({
@@ -81,7 +81,7 @@ describe('Statful Util Unit testing', function () {
         jasmine.clock().uninstall();
     });
 
-    it("should unregister queue", function () {
+    it('should unregister queue', function () {
         jasmine.clock().install();
         spyOn(statfulUtil, 'sendRequest');
 

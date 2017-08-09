@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+
+'use strict';
 
 function Logger(enableDebug) {
     this.debugEnabled = enableDebug || false;
