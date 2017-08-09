@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 (function (window) {
     'use strict';
 
@@ -29,4 +31,3 @@
     window.StatfulLogger = Logger;
 
 })(window);
-
