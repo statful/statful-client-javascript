@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 describe('Statful Logger Unit testing', function () {
     var logger;
 
