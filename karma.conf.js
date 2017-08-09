@@ -1,24 +1,25 @@
-module.exports = function (config) {
+module.exports = function(config) {
     'use strict';
 
     config.set({
-        // base path that will be used to resolve all patterns (eg. files, exclude)
+    // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
-
+        //
         // list of files / patterns to load in the browser (order matters)
         files: [
-            {pattern: require.resolve('usertiming/src/usertiming.js'), include: true},
-            {pattern: require.resolve('js-polyfills/es5.js'), include: true},
-            {pattern: require.resolve('js-polyfills/xhr.js'), include: true},
-            {pattern: require.resolve('jasmine-ajax/lib/mock-ajax.js'), included: true},
-            {pattern: 'src/logger.js', included: true},
-            {pattern: 'src/statful.js', included: true},
-            {pattern: 'src/statful-util.js', included: true},
-            {pattern: 'tests/*.tests.js', included: true}
+            {
+                pattern: require.resolve('usertiming/src/usertiming.js'),
+                include: true
+            },
+            { pattern: require.resolve('js-polyfills/es5.js'), include: true },
+            { pattern: require.resolve('js-polyfills/xhr.js'), include: true },
+            { pattern: require.resolve('jasmine-ajax'), include: true },
+            { pattern: 'src/*.js', included: false },
+            { pattern: 'tests/*.tests.js', included: true }
         ],
 
         // list of files to exclude
@@ -33,9 +34,16 @@ module.exports = function (config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            'src/*.js': ['coverage']
+            'src/*.js': ['rollup', 'coverage'],
+            'tests/*.tests.js': ['rollup']
         },
 
+        rollupPreprocessor: {
+            plugins: [require('rollup-plugin-babel')()],
+            format: 'iife', // Helps prevent naming collisions.
+            moduleName: 'statful', // Required for 'iife' format.
+            sourceMap: 'inline' // Sensible for testing.
+        },
         coverageReporter: {
             reporters: [
                 {
@@ -64,6 +72,5 @@ module.exports = function (config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['PhantomJS']
-    }
-    );
+    });
 };

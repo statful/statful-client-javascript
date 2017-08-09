@@ -1,3 +1,5 @@
+import StatfulUtil from '../src/statful-util';
+
 describe('Statful Util Unit testing', function () {
     var statfulUtil;
 

@@ -1,3 +1,6 @@
+import statful from '../src/statful';
+import StatfulUtil from '../src/statful-util';
+
 describe('Statful Client Unit testing', function () {
     'use strict';
 
