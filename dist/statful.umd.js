@@ -573,32 +573,78 @@
     }
 })(typeof window !== "undefined" ? window : undefined);
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
 /* eslint-disable no-console */
+var Logger = function () {
+    function Logger(enableDebug) {
+        classCallCheck(this, Logger);
 
-function Logger(enableDebug) {
-    this.debugEnabled = enableDebug || false;
-}
-
-Logger.prototype.info = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.info.apply(console, args);
+        this.debugEnabled = enableDebug || false;
     }
-};
 
-Logger.prototype.debug = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.debug.apply(console, args);
-    }
-};
-
-Logger.prototype.error = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.error.apply(console, args);
-    }
-};
+    createClass(Logger, [{
+        key: "info",
+        value: function info() {
+            if (this.debugEnabled) {
+                console.info.apply(console, Array.prototype.slice.call(arguments));
+            }
+        }
+    }, {
+        key: "debug",
+        value: function debug() {
+            if (this.debugEnabled) {
+                console.debug.apply(console, Array.prototype.slice.call(arguments));
+            }
+        }
+    }, {
+        key: "error",
+        value: function error() {
+            if (this.debugEnabled) {
+                console.error.apply(console, Array.prototype.slice.call(arguments));
+            }
+        }
+    }]);
+    return Logger;
+}();
 
 function StatfulUtil(config) {
     config = config || {};
@@ -819,12 +865,6 @@ function StatfulUtil(config) {
         return freq;
     };
 }
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
 
 /**
  * @description

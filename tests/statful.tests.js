@@ -1,22 +1,20 @@
 import statful from '../src/statful';
 import StatfulUtil from '../src/statful-util';
 
-describe('Statful Client Unit testing', function () {
-    'use strict';
-
-    afterEach(function () {
+describe('Statful Client Unit testing', () => {
+    afterEach(() => {
         statful.perf.clearMarks();
         statful.perf.clearMeasures();
     });
 
-    it('should exist the module statful and have configs', function () {
+    it('should exist the module statful and have configs', () => {
         expect(statful).not.toBeNull();
         expect(statful.config.apiAddress).toEqual('https://beacon.statful.com');
         expect(statful.endpoints.metrics).toEqual('beacon/metrics');
 
     });
 
-    it('should should have defaults', function () {
+    it('should should have defaults', () => {
         statful.initialize();
 
         expect(statful.config.dryrun).toEqual(false);
@@ -27,7 +25,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.config.aggregationFrequency).toEqual(10);
         expect(statful.config.flushInterval).toEqual(10000);
 
-        expect(statful.config.timer.tags).toEqual({ unit: 'ms'});
+        expect(statful.config.timer.tags).toEqual({unit: 'ms'});
         expect(statful.config.timer.aggregations).toEqual(['avg', 'p90', 'count']);
 
         expect(statful.config.counter.tags).toEqual({});
@@ -37,7 +35,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.config.gauge.aggregations).toEqual(['last']);
     });
 
-    it('should merge global, method, type tags and aggregations and override aggregation frequency', function() {
+    it('should merge global, method, type tags and aggregations and override aggregation frequency', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
@@ -45,11 +43,11 @@ describe('Statful Client Unit testing', function () {
             gauge: {tags: {meh: 'yep'}, aggregations: ['derivative']}
         });
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             agg: [],
             aggFreq: 300
@@ -60,7 +58,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 300,
@@ -69,7 +67,7 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should override aggregation frequency by type over global', function() {
+    it('should override aggregation frequency by type over global', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
@@ -77,11 +75,11 @@ describe('Statful Client Unit testing', function () {
             gauge: {tags: {meh: 'yep'}, aggregations: [], aggregationFrequency: 60}
         });
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             agg: []
         };
@@ -91,7 +89,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 60,
@@ -100,7 +98,7 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should override sample rate by type over global', function() {
+    it('should override sample rate by type over global', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
@@ -108,11 +106,11 @@ describe('Statful Client Unit testing', function () {
             gauge: {tags: {meh: 'yep'}, aggregations: [], aggregationFrequency: 60}
         });
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             agg: [],
             sampleRate: 50
@@ -123,7 +121,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 60,
@@ -132,7 +130,7 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should discard invalid aggregations', function() {
+    it('should discard invalid aggregations', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last', 'invalid'],
@@ -140,11 +138,11 @@ describe('Statful Client Unit testing', function () {
             gauge: {tags: {meh: 'yep'}, aggregations: []}
         });
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             agg: ['fail'],
             aggFreq: 300
@@ -155,7 +153,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: ['last'],
             aggregationFrequency: 300,
@@ -164,18 +162,18 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should discard invalid aggregation frequency', function() {
+    it('should discard invalid aggregation frequency', () => {
         statful.initialize({
             tags: {},
             aggregations: [],
             gauge: {tags: {meh: 'yep'}, aggregations: []}
         });
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             aggFreq: 1234
         };
@@ -185,7 +183,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge', meh: 'yep'},
             aggregations: [],
             aggregationFrequency: 10,
@@ -194,13 +192,13 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should have an instance of StatfulUtil', function() {
+    it('should have an instance of StatfulUtil', () => {
         statful.initialize();
-        var utilInstance = statful.util instanceof StatfulUtil;
+        let utilInstance = statful.util instanceof StatfulUtil;
         expect(utilInstance).toEqual(true);
     });
 
-    it('should override default config', function () {
+    it('should override default config', () => {
         statful.initialize({
             dryrun: true
         });
@@ -208,13 +206,13 @@ describe('Statful Client Unit testing', function () {
         expect(statful.config.dryrun).toEqual(true);
     });
 
-    it('should return the duration of a measure when calling measureTimeUserTiming', function () {
+    it('should return the duration of a measure when calling measureTimeUserTiming', () => {
         statful.initialize();
 
         statful.registerMark('start_test');
         statful.registerMark('end_test');
 
-        var options = {
+        let options = {
             startMark: 'start_test',
             endMark: 'end_test',
             clearMarks: false,
@@ -228,7 +226,7 @@ describe('Statful Client Unit testing', function () {
         statful.clearMeasures();
     });
 
-    it('should clear all performance marks when calling clearMarks without arguments', function () {
+    it('should clear all performance marks when calling clearMarks without arguments', () => {
         statful.initialize();
 
         statful.registerMark('start_test');
@@ -240,7 +238,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.clearMarks).toHaveBeenCalled();
     });
 
-    it('should clear performance marks when calling clearMarks with an Array of marks', function () {
+    it('should clear performance marks when calling clearMarks with an Array of marks', () => {
         statful.initialize();
 
         statful.registerMark('start_test');
@@ -252,7 +250,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.clearMarks).toHaveBeenCalledWith('start_test');
     });
 
-    it('should clear all performance measures when calling clearMeasures without arguments', function () {
+    it('should clear all performance measures when calling clearMeasures without arguments', () => {
         statful.initialize();
 
         spyOn(statful.perf, 'clearMeasures');
@@ -262,7 +260,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.clearMeasures).toHaveBeenCalled();
     });
 
-    it('should clear performance measures when calling clearMeasures with an Array of measures', function () {
+    it('should clear performance measures when calling clearMeasures with an Array of measures', () => {
         statful.initialize();
 
         statful.registerMeasure('measure', 'metric');
@@ -274,7 +272,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.clearMarks).toHaveBeenCalledWith('measure');
     });
 
-    it('should add a performance mark when calling registerMark', function () {
+    it('should add a performance mark when calling registerMark', () => {
         statful.initialize();
 
         spyOn(statful.perf, 'mark');
@@ -284,7 +282,7 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.mark).toHaveBeenCalledWith('mark_test');
     });
 
-    it('should add a performance measure when calling registerMeasure', function () {
+    it('should add a performance measure when calling registerMeasure', () => {
         statful.initialize();
 
         spyOn(statful.perf, 'measure');
@@ -294,18 +292,18 @@ describe('Statful Client Unit testing', function () {
         expect(statful.perf.measure).toHaveBeenCalledWith('measure_test', undefined, jasmine.any(String));
     });
 
-    it('should call addItemToQueue when registerMeasure', function() {
+    it('should call addItemToQueue when registerMeasure', () => {
         statful.initialize();
 
         statful.registerMark('start_test');
 
-        setTimeout(function() {
+        setTimeout(() => {
             statful.registerMark('end_test');
 
-            var util = statful.util;
+            let util = statful.util;
             spyOn(util, 'addItemToQueue');
 
-            var options = {
+            let options = {
                 startMark: 'start_test',
                 endMark: 'end_test',
                 tags: {mark: 'measure'},
@@ -319,14 +317,14 @@ describe('Statful Client Unit testing', function () {
         }, 50);
     });
 
-    it('should call addItemToQueue when registerMeasure with valid metric and default tags/aggregations', function() {
+    it('should call addItemToQueue when registerMeasure with valid metric and default tags/aggregations', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'measure'},
             aggregations: []
         };
@@ -345,14 +343,14 @@ describe('Statful Client Unit testing', function () {
         });
     });
 
-    it('should call addItemToQueue when timer', function() {
+    it('should call addItemToQueue when timer', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'foo'},
             agg: []
         };
@@ -362,10 +360,10 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalled();
     });
 
-    it('should not call addItemToQueue when invalid timer', function() {
+    it('should not call addItemToQueue when invalid timer', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
@@ -375,14 +373,14 @@ describe('Statful Client Unit testing', function () {
     });
 
 
-    it('should call addItemToQueue when counter', function() {
+    it('should call addItemToQueue when counter', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'foo'},
             agg: []
         };
@@ -392,10 +390,10 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalled();
     });
 
-    it('should call addItemToQueue when counter without value', function() {
+    it('should call addItemToQueue when counter without value', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
@@ -404,10 +402,10 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalled();
     });
 
-    it('should not call addItemToQueue when invalid counter', function() {
+    it('should not call addItemToQueue when invalid counter', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
@@ -416,14 +414,14 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue.calls.count()).toEqual(0);
     });
 
-    it('should call addItemToQueue when gauge with valid metric and default tags/aggregations', function() {
+    it('should call addItemToQueue when gauge with valid metric and default tags/aggregations', () => {
         statful.initialize();
 
-        var util = statful.util;
+        let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
 
-        var options = {
+        let options = {
             tags: {mark: 'gauge'},
             agg: [],
             aggFreq: 30
@@ -434,7 +432,7 @@ describe('Statful Client Unit testing', function () {
         expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
             name: 'test',
             type: 'gauge',
-            value:  1234,
+            value: 1234,
             tags: {mark: 'gauge'},
             aggregations: ['last'],
             aggregationFrequency: 30,

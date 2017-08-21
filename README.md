@@ -144,7 +144,7 @@ You can omit both start and end mark names:
 ### Installation
 
 ```bash
-$ npm install && bower install
+$ npm install
 ```
 
 ### Tests

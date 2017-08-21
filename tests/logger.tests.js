@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import StatfulLogger from '../src/logger';
 
-describe('Statful Logger Unit testing', function () {
-    var logger;
+describe('Statful Logger Unit testing', () => {
+    let logger;
 
-    it('should log info', function () {
+    it('should log info', () => {
         logger = new StatfulLogger(true);
         spyOn(console, 'info');
 
@@ -13,7 +13,7 @@ describe('Statful Logger Unit testing', function () {
         expect(console.info).toHaveBeenCalledWith('info');
     });
 
-    it('should not log info', function () {
+    it('should not log info', () => {
         logger = new StatfulLogger(false);
         spyOn(console, 'info');
 
@@ -22,7 +22,7 @@ describe('Statful Logger Unit testing', function () {
         expect(console.info).not.toHaveBeenCalled();
     });
 
-    it('should log debug', function () {
+    it('should log debug', () => {
         logger = new StatfulLogger(true);
         spyOn(console, 'debug');
 
@@ -31,7 +31,7 @@ describe('Statful Logger Unit testing', function () {
         expect(console.debug).toHaveBeenCalledWith('debug');
     });
 
-    it('should not log debug', function () {
+    it('should not log debug', () => {
         logger = new StatfulLogger(false);
         spyOn(console, 'debug');
 
@@ -40,7 +40,7 @@ describe('Statful Logger Unit testing', function () {
         expect(console.debug).not.toHaveBeenCalled();
     });
 
-    it('should log error', function () {
+    it('should log error', () => {
         logger = new StatfulLogger(true);
         spyOn(console, 'error');
 
@@ -49,7 +49,7 @@ describe('Statful Logger Unit testing', function () {
         expect(console.error).toHaveBeenCalledWith('error');
     });
 
-    it('should not log error', function () {
+    it('should not log error', () => {
         logger = new StatfulLogger(false);
         spyOn(console, 'error');
 

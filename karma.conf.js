@@ -13,7 +13,6 @@ module.exports = function(config) {
         files: [
             { pattern: require.resolve('usertiming'), include: false },
             { pattern: require.resolve('jasmine-ajax'), include: true },
-            { pattern: 'src/*.js', included: false },
             { pattern: 'tests/*.tests.js', included: true }
         ],
 
@@ -29,12 +28,17 @@ module.exports = function(config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            'src/*.js': ['rollup', 'coverage'],
             'tests/*.tests.js': ['rollup']
         },
 
         rollupPreprocessor: {
             plugins: [
+                require('rollup-plugin-istanbul')({
+                    exclude: [
+                        'tests/*.js',
+                        'node_modules/usertiming/src/usertiming.js'
+                    ]
+                }),
                 require('rollup-plugin-node-resolve')(),
                 require('rollup-plugin-babel')()
             ],

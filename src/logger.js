@@ -1,30 +1,24 @@
 /* eslint-disable no-console */
+export default class Logger {
+    constructor(enableDebug) {
+        this.debugEnabled = enableDebug || false;
+    }
 
-'use strict';
+    info() {
+        if (this.debugEnabled) {
+            console.info.apply(console, Array.prototype.slice.call(arguments));
+        }
+    }
 
-function Logger(enableDebug) {
-    this.debugEnabled = enableDebug || false;
+    debug() {
+        if (this.debugEnabled) {
+            console.debug.apply(console, Array.prototype.slice.call(arguments));
+        }
+    }
+
+    error() {
+        if (this.debugEnabled) {
+            console.error.apply(console, Array.prototype.slice.call(arguments));
+        }
+    }
 }
-
-Logger.prototype.info = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.info.apply(console, args);
-    }
-};
-
-Logger.prototype.debug = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.debug.apply(console, args);
-    }
-};
-
-Logger.prototype.error = function () {
-    if (this.debugEnabled) {
-        var args = Array.prototype.slice.call(arguments);
-        console.error.apply(console, args);
-    }
-};
-
-export default Logger;
