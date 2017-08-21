@@ -1,17 +1,11 @@
 import statful from '../src/statful';
 import StatfulUtil from '../src/statful-util';
+import Metric from '../src/metric.model';
 
 describe('Statful Client Unit testing', () => {
     afterEach(() => {
-        statful.perf.clearMarks();
-        statful.perf.clearMeasures();
-    });
-
-    it('should exist the module statful and have configs', () => {
-        expect(statful).not.toBeNull();
-        expect(statful.config.apiAddress).toEqual('https://beacon.statful.com');
-        expect(statful.endpoints.metrics).toEqual('beacon/metrics');
-
+        window.performance.clearMarks();
+        window.performance.clearMeasures();
     });
 
     it('should should have defaults', () => {
@@ -33,6 +27,9 @@ describe('Statful Client Unit testing', () => {
 
         expect(statful.config.gauge.tags).toEqual({});
         expect(statful.config.gauge.aggregations).toEqual(['last']);
+
+        expect(statful.config.apiAddress).toEqual('https://beacon.statful.com');
+        expect(statful.endpoints.metrics).toEqual('beacon/metrics');
     });
 
     it('should merge global, method, type tags and aggregations and override aggregation frequency', () => {
@@ -55,16 +52,9 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge', meh: 'yep'},
-            aggregations: ['last'],
-            aggregationFrequency: 300,
-            namespace: 'web',
-            sampleRate: 100
-        });
+
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should override aggregation frequency by type over global', () => {
@@ -86,16 +76,8 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge', meh: 'yep'},
-            aggregations: ['last'],
-            aggregationFrequency: 60,
-            namespace: 'web',
-            sampleRate: 100
-        });
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should override sample rate by type over global', () => {
@@ -118,16 +100,8 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge', meh: 'yep'},
-            aggregations: ['last'],
-            aggregationFrequency: 60,
-            namespace: 'web',
-            sampleRate: 50
-        });
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should discard invalid aggregations', () => {
@@ -150,16 +124,8 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge', meh: 'yep'},
-            aggregations: ['last'],
-            aggregationFrequency: 300,
-            namespace: 'web',
-            sampleRate: 100
-        });
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should discard invalid aggregation frequency', () => {
@@ -180,16 +146,8 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge', meh: 'yep'},
-            aggregations: [],
-            aggregationFrequency: 10,
-            namespace: 'web',
-            sampleRate: 100
-        });
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should have an instance of StatfulUtil', () => {
@@ -231,11 +189,11 @@ describe('Statful Client Unit testing', () => {
 
         statful.registerMark('start_test');
 
-        spyOn(statful.perf, 'clearMarks');
+        spyOn(window.performance, 'clearMarks');
 
         statful.clearMarks();
 
-        expect(statful.perf.clearMarks).toHaveBeenCalled();
+        expect(window.performance.clearMarks).toHaveBeenCalled();
     });
 
     it('should clear performance marks when calling clearMarks with an Array of marks', () => {
@@ -243,21 +201,21 @@ describe('Statful Client Unit testing', () => {
 
         statful.registerMark('start_test');
 
-        spyOn(statful.perf, 'clearMarks');
+        spyOn(window.performance, 'clearMarks');
 
         statful.clearMarks(['start_test']);
 
-        expect(statful.perf.clearMarks).toHaveBeenCalledWith('start_test');
+        expect(window.performance.clearMarks).toHaveBeenCalledWith('start_test');
     });
 
     it('should clear all performance measures when calling clearMeasures without arguments', () => {
         statful.initialize();
 
-        spyOn(statful.perf, 'clearMeasures');
+        spyOn(window.performance, 'clearMeasures');
 
         statful.clearMeasures();
 
-        expect(statful.perf.clearMeasures).toHaveBeenCalled();
+        expect(window.performance.clearMeasures).toHaveBeenCalled();
     });
 
     it('should clear performance measures when calling clearMeasures with an Array of measures', () => {
@@ -265,31 +223,31 @@ describe('Statful Client Unit testing', () => {
 
         statful.registerMeasure('measure', 'metric');
 
-        spyOn(statful.perf, 'clearMarks');
+        spyOn(window.performance, 'clearMarks');
 
         statful.clearMarks(['measure']);
 
-        expect(statful.perf.clearMarks).toHaveBeenCalledWith('measure');
+        expect(window.performance.clearMarks).toHaveBeenCalledWith('measure');
     });
 
     it('should add a performance mark when calling registerMark', () => {
         statful.initialize();
 
-        spyOn(statful.perf, 'mark');
+        spyOn(window.performance, 'mark');
 
         statful.registerMark('mark_test');
 
-        expect(statful.perf.mark).toHaveBeenCalledWith('mark_test');
+        expect(window.performance.mark).toHaveBeenCalledWith('mark_test');
     });
 
     it('should add a performance measure when calling registerMeasure', () => {
         statful.initialize();
 
-        spyOn(statful.perf, 'measure');
+        spyOn(window.performance, 'measure');
 
         statful.registerMeasure('measure_test', 'metric_test');
 
-        expect(statful.perf.measure).toHaveBeenCalledWith('measure_test', undefined, jasmine.any(String));
+        expect(window.performance.measure).toHaveBeenCalledWith('measure_test', undefined, jasmine.any(String));
     });
 
     it('should call addItemToQueue when registerMeasure', () => {
@@ -323,6 +281,7 @@ describe('Statful Client Unit testing', () => {
         let util = statful.util;
 
         spyOn(util, 'addItemToQueue');
+        spyOn(statful, 'measureTimeUserTiming').and.returnValue(1000);
 
         let options = {
             tags: {mark: 'measure'},
@@ -331,16 +290,8 @@ describe('Statful Client Unit testing', () => {
 
         statful.registerMeasure('measure_test', 'metric_test', options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'metric_test',
-            type: 'timer',
-            value: jasmine.any(Number),
-            tags: {mark: 'measure', unit: 'ms'},
-            aggregations: ['avg', 'p90', 'count'],
-            aggregationFrequency: 10,
-            namespace: 'web',
-            sampleRate: 100
-        });
+        const metric = new Metric('metric_test', 'timer', 1000, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 
     it('should call addItemToQueue when timer', () => {
@@ -429,15 +380,7 @@ describe('Statful Client Unit testing', () => {
 
         statful.gauge('test', 1234, options);
 
-        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', {
-            name: 'test',
-            type: 'gauge',
-            value: 1234,
-            tags: {mark: 'gauge'},
-            aggregations: ['last'],
-            aggregationFrequency: 30,
-            namespace: 'web',
-            sampleRate: 100
-        });
+        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        expect(util.addItemToQueue).toHaveBeenCalledWith('metrics', metric);
     });
 });
