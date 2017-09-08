@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 2.0.3
+* statful-client-javascript 2.0.4
 * Copyright 2017 Statful <https://www.statful.com/>
 */
 
