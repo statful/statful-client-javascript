@@ -17,22 +17,22 @@ export default class Metric {
             typeAggregationFrequency = config[type].aggregationFrequency;
         }
 
-        this.tags = this.setTags(options.tags, config.tags, typeTags, config.app);
-        this.aggregations = this.setAggregations(options.aggregations, config.aggregations, typeAggregations);
-        this.aggregationFrequency = this.setAggregationFrequency(options.aggregationFrequency, config.aggregationFrequency, typeAggregationFrequency);
+        this.tags = this.buildTags(options.tags, config.tags, typeTags, config.app);
+        this.aggregations = this.buildAggregations(options.aggregations, config.aggregations, typeAggregations);
+        this.aggregationFrequency = this.buildAggregationFrequency(options.aggregationFrequency, config.aggregationFrequency, typeAggregationFrequency);
         this.namespace = options.namespace || config.namespace;
         this.sampleRate = options.sampleRate || config.sampleRate;
     }
 
     /**
-     * Define tags for a metric type
+     * Build tags for a metric type
      * @param {object} methodTags - list of method tags
      * @param {object} globalTags - list of global tags
      * @param {object} typeTags - list of type tags
      * @param {string} app - app tag value
      * @returns {*}
      */
-    setTags(methodTags = {}, globalTags = {}, typeTags = {}, app) {
+    buildTags(methodTags = {}, globalTags = {}, typeTags = {}, app) {
         let tags = {};
 
         Object.assign(tags, globalTags);
@@ -47,15 +47,16 @@ export default class Metric {
     }
 
     /**
-     * Define aggregations for a metric type
+     * Build aggregations for a metric type
      * @param {Array} methodAggregations - list of method aggregations
      * @param {Array} globalAggregations - list of global aggregations
      * @param {Array} typeAggregations - list of type aggregations
      * @returns {*|Array}
      */
-    setAggregations(methodAggregations = [], globalAggregations = [], typeAggregations = []) {
-        let aggregations = globalAggregations;
+    buildAggregations(methodAggregations = [], globalAggregations = [], typeAggregations = []) {
+        let aggregations = [];
 
+        aggregations = aggregations.concat(globalAggregations);
         aggregations = aggregations.concat(typeAggregations).filter(this.uniq);
         aggregations = aggregations.concat(methodAggregations).filter(this.uniq);
 
@@ -74,12 +75,12 @@ export default class Metric {
     }
 
     /**
-     * Define aggregation frequency
+     * Build aggregation frequency
      * @param {number} methodFrequency - method aggregation frequency
      * @param {number} globalFrequency - global aggregation frequency
      * @param {number} typeFrequency - type aggregation frequency
      */
-    setAggregationFrequency(methodFrequency, globalFrequency, typeFrequency) {
+    buildAggregationFrequency(methodFrequency, globalFrequency, typeFrequency) {
         let frequency = methodFrequency || typeFrequency || globalFrequency;
 
         return this.filterAggregationFrequency(frequency);
@@ -91,9 +92,7 @@ export default class Metric {
      * @returns {Array}
      */
     filterAggregations(aggregations = []) {
-        return aggregations.filter((item) => {
-            return aggregationList.includes(item);
-        });
+        return aggregations.filter((item) => aggregationList.includes(item));
     }
 
     /**
@@ -102,12 +101,6 @@ export default class Metric {
      * @returns {*}
      */
     filterAggregationFrequency(frequency) {
-        let freq = 10;
-
-        if (aggregationFrequencyList.includes(frequency)) {
-            freq = frequency;
-        }
-
-        return freq;
+        return (aggregationFrequencyList.includes(frequency)) ? frequency : 10;
     }
 }

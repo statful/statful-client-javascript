@@ -4,10 +4,7 @@ export default class StatfulUtil {
     constructor(config) {
         this.config = {};
         this.listQueues = [];
-
-        Object.keys(config).forEach((key) => {
-            this.config[key] = config[key];
-        });
+        Object.assign(this.config, config);
 
         this.logger = new StatfulLogger(this.config.debug);
     }
@@ -18,10 +15,9 @@ export default class StatfulUtil {
      * @param {string} requestData - request data
      */
     sendRequest(endpoint, requestData) {
-        let requestArr = [this.config.apiAddress, endpoint];
-        const requestUrl = requestArr.join('/');
+        const requestUrl = `${this.config.apiAddress}/${endpoint}`;
 
-        this.logger.debug('Request: ' + requestUrl, requestData);
+        this.logger.debug('Request: ${requestUrl}', requestData);
 
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.open('POST', requestUrl, true);
