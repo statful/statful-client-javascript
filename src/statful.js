@@ -190,7 +190,7 @@ export default class Statful {
                 if (time) {
                     // Push metrics to queue
                     let metricItem = new Metric(metricName, 'timer', time, defaults, this.config);
-                    this.util.addMetricToQueue(metricItem);
+                    this.util.addMetric(metricItem, true);
                 } else {
                     this.logger.error('Failed to get measure time to register as timer value');
                 }
@@ -218,14 +218,9 @@ export default class Statful {
      */
     static timer(metricName, metricValue, options = {}) {
         this.logger.debug('Register Timer', metricName, metricValue, options);
-        if (!isNaN(metricValue) && metricName) {
-            metricValue = Math.abs(metricValue);
-            // Push metrics to queue
-            let item = new Metric(metricName, 'timer', metricValue, options, this.config);
-            this.util.addMetricToQueue(item);
-        } else {
-            this.logger.error('Undefined metric name or invalid value to register as a timer');
-        }
+        let metric = new Metric(metricName, 'timer', metricValue, options, this.config);
+
+        this.util.addMetric(metric, true);
     }
 
     /**
@@ -236,15 +231,10 @@ export default class Statful {
      */
     static counter(metricName, metricValue = 1, options = {}) {
         this.logger.debug('Register Counter', metricName, options);
-        if (!isNaN(metricValue) && metricName) {
-            metricValue = Math.abs(parseInt(metricValue, 10));
+        let metric = new Metric(metricName, 'counter', metricValue, options, this.config);
+        metric.value = Math.abs(parseInt(metric.value, 10));
 
-            // Push metrics to queue
-            let item = new Metric(metricName, 'counter', metricValue, options, this.config);
-            this.util.addMetricToQueue(item);
-        } else {
-            this.logger.error('Undefined metric name or invalid value to register as a counter');
-        }
+        this.util.addMetric(metric, true);
     }
 
     /**
@@ -255,12 +245,21 @@ export default class Statful {
      */
     static gauge(metricName, metricValue, options = {}) {
         this.logger.debug('Register Gauge', metricName, metricValue, options);
-        if (!isNaN(metricValue) && metricName) {
-            // Push metrics to queue
-            let item = new Metric(metricName, 'gauge', metricValue, options, this.config);
-            this.util.addMetricToQueue(item);
-        } else {
-            this.logger.error('Undefined metric name or invalid value to register as a gauge');
-        }
+        let metric = new Metric(metricName, 'gauge', metricValue, options, this.config);
+
+        this.util.addMetric(metric, true);
+    }
+
+    /**
+     * Send Metric without going to Queue
+     * @param {string} type -  metric type to be sent
+     * @param {string} metricName -  metric name to be sent
+     * @param {number} metricValue - gauge value to be sent
+     * @param {object} options - set of option (tags, agg, aggFreq, namespace)
+     */
+    static sendMetric (type, metricName, metricValue, options = {}) {
+        let metric = new Metric(metricName, type, metricValue, options, this.config);
+
+        this.util.addMetric(metric, false);
     }
 }

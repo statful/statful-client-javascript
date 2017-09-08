@@ -12,30 +12,32 @@ export default class StatfulUtil {
     }
 
     /**
-     * Sends HTTP request to the api
-     * @param {object} requestData - request data
+     * Sends data
+     * @param {object} data
      */
-    sendRequest(requestData) {
+    sendData(data) {
         const requestUrl = `${this.config.apiAddress}/beacon/metrics`;
-        requestData = JSON.stringify(requestData);
+        const requestData = JSON.stringify(data);
 
-        this.logger.debug('Request: ${requestUrl}', requestData);
+        if (!this.config.dryrun) {
+            let xmlHttp = new XMLHttpRequest();
+            xmlHttp.open('POST', requestUrl, true);
+            xmlHttp.timeout = this.config.timeout;
 
-        let xmlHttp = new XMLHttpRequest();
-        xmlHttp.open('POST', requestUrl, true);
-        xmlHttp.timeout = this.config.timeout;
+            //Send the proper header information along with the request
+            xmlHttp.setRequestHeader('Content-type', 'application/json');
+            xmlHttp.send(requestData);
 
-        //Send the proper header information along with the request
-        xmlHttp.setRequestHeader('Content-type', 'application/json');
-        xmlHttp.send(requestData);
-
-        xmlHttp.onreadystatechange = () => {
-            if (xmlHttp.status == 200 || xmlHttp.status == 201) {
-                this.logger.debug('Successfully send metric');
-            } else {
-                this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
-            }
-        };
+            xmlHttp.onreadystatechange = () => {
+                if (xmlHttp.status == 200 || xmlHttp.status == 201) {
+                    this.logger.debug('Successfully send metric');
+                } else {
+                    this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
+                }
+            };
+        } else {
+            this.logger.debug('Dryrun data', data);
+        }
     }
 
     /**
@@ -47,14 +49,10 @@ export default class StatfulUtil {
 
         this.metricsQueue = [];
 
-        if (typeof this.config.flushInterval === 'number' && flushInterval > 0) {
+        if (typeof flushInterval === 'number' && flushInterval > 0) {
             metricsTimer = setInterval(() => {
                 if (this.metricsQueue.length > 0) {
-                    if (!this.config.dryrun) {
-                        this.sendRequest(this.metricsQueue);
-                    } else {
-                        this.logger.debug('Dryrun data', this.metricsQueue);
-                    }
+                    this.sendData(this.metricsQueue);
                     this.metricsQueue = [];
                 }
 
@@ -71,18 +69,33 @@ export default class StatfulUtil {
     }
 
     /**
-     * Sends a metric to the queue
+     * Add Metric
+     * @param {object} metric - object to be sent
+     * @param {Boolean} usingQueue
+     */
+    addMetric(metric = {}, usingQueue = true) {
+        if (metric && typeof metric.isValid === 'function' && metric.isValid()) {
+            if (this.shouldAddMetric(metric)) {
+                if (usingQueue) {
+                    this.metricsQueue.push(metric);
+                } else {
+                    this.sendData([metric]);
+                }
+            } else {
+                this.logger.debug('Metric was discarded due to sample rate.');
+            }
+        } else {
+            this.logger.error('Invalid metric.');
+        }
+    }
+
+    /**
+     * Determines is a metric should be sent to the server
      * @param {object} metric - object to be sent
      */
-    addMetricToQueue(metric = {}) {
-        const sampleRateNormalized = (metric.sampleRate || this.config.sampleRate || 100) / 100;
+    shouldAddMetric (metric = {}) {
+        const sampleRate = (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
-        if (Math.random() <= sampleRateNormalized) {
-            this.metricsQueue.push(metric);
-            return true;
-        } else {
-            this.logger.debug('Metric was discarded due to sample rate.');
-            return false;
-        }
+        return Math.random() <= sampleRate;
     }
 }
