@@ -648,36 +648,32 @@ var Logger = function () {
 
 var StatfulUtil = function () {
     function StatfulUtil(config) {
-        var _this = this;
-
         classCallCheck(this, StatfulUtil);
 
         this.config = {};
-        this.listQueues = [];
-
-        Object.keys(config).forEach(function (key) {
-            _this.config[key] = config[key];
-        });
+        Object.assign(this.config, config);
 
         this.logger = new Logger(this.config.debug);
+        if (this.config && this.config.flushInterval) {
+            this.registerQueue(this.config.flushInterval);
+        }
     }
 
     /**
      * Sends HTTP request to the api
-     * @param {string} endpoint - action
-     * @param {string} requestData - request data
+     * @param {object} requestData - request data
      */
 
 
     createClass(StatfulUtil, [{
         key: 'sendRequest',
-        value: function sendRequest(endpoint, requestData) {
-            var _this2 = this;
+        value: function sendRequest(requestData) {
+            var _this = this;
 
-            var requestArr = [this.config.apiAddress, endpoint];
-            var requestUrl = requestArr.join('/');
+            var requestUrl = this.config.apiAddress + '/beacon/metrics';
+            requestData = JSON.stringify(requestData);
 
-            this.logger.debug('Request: ' + requestUrl, requestData);
+            this.logger.debug('Request: ${requestUrl}', requestData);
 
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open('POST', requestUrl, true);
@@ -689,45 +685,42 @@ var StatfulUtil = function () {
 
             xmlHttp.onreadystatechange = function () {
                 if (xmlHttp.status == 200 || xmlHttp.status == 201) {
-                    _this2.logger.debug('Successfully send metric');
+                    _this.logger.debug('Successfully send metric');
                 } else {
-                    _this2.logger.debug('Error send metric', requestUrl, xmlHttp.status);
+                    _this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
                 }
             };
         }
 
         /**
          * Register a new queue
-         * @param {string} queueName - queue name
-         * @param {string} endpoint - endpoint to send requests
-         * @param {int} timeInterval - interval in milliseconds, default 30000 ms
+         * @param {number} flushInterval
          */
 
     }, {
         key: 'registerQueue',
-        value: function registerQueue(queueName, endpoint, timeInterval) {
-            var _this3 = this;
+        value: function registerQueue(flushInterval) {
+            var _this2 = this;
 
-            timeInterval = timeInterval || this.config.flushInterval;
+            var metricsTimer = void 0;
 
-            if (typeof queueName === 'string' && typeof timeInterval === 'number') {
-                this.listQueues[queueName] = {
-                    data: [],
-                    endpoint: endpoint
-                };
+            this.metricsQueue = [];
 
-                this.listQueues[queueName].timer = setInterval(function () {
-                    var queue = _this3.listQueues[queueName];
-
-                    if (queue.data.length > 0) {
-                        if (!_this3.config.dryrun) {
-                            _this3.sendRequest(queue.endpoint, JSON.stringify(queue.data));
+            if (typeof this.config.flushInterval === 'number' && flushInterval > 0) {
+                metricsTimer = setInterval(function () {
+                    if (_this2.metricsQueue.length > 0) {
+                        if (!_this2.config.dryrun) {
+                            _this2.sendRequest(_this2.metricsQueue);
                         } else {
-                            _this3.logger.debug('Dryrun data', queue.endpoint, queue.data);
+                            _this2.logger.debug('Dryrun data', _this2.metricsQueue);
                         }
-                        queue.data = [];
+                        _this2.metricsQueue = [];
                     }
-                }, timeInterval);
+                }, flushInterval);
+
+                window.addEventListener('beforeunload', function () {
+                    clearInterval(metricsTimer);
+                });
 
                 return true;
             } else {
@@ -736,34 +729,19 @@ var StatfulUtil = function () {
         }
 
         /**
-         * Unregister queue
-         * @param {string} queueName - queue name
+         * Sends a metric to the queue
+         * @param {object} metric - object to be sent
          */
 
     }, {
-        key: 'unregisterQueue',
-        value: function unregisterQueue(queueName) {
-            if (this.listQueues[queueName]) {
-                clearInterval(this.listQueues[queueName].timer);
-                this.listQueues[queueName] = undefined;
-            }
-        }
+        key: 'addMetricToQueue',
+        value: function addMetricToQueue() {
+            var metric = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        /**
-         * Sends an Item to a specific queue
-         * @param {string} queueName - queue name
-         * @param {object} item - object to be sent
-         */
+            var sampleRateNormalized = (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
-    }, {
-        key: 'addItemToQueue',
-        value: function addItemToQueue(queueName) {
-            var item = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-            var sampleRateNormalized = (item.sampleRate || this.config.sampleRate || 100) / 100;
-
-            if (this.listQueues[queueName] && Math.random() <= sampleRateNormalized) {
-                this.listQueues[queueName].data.push(item);
+            if (Math.random() <= sampleRateNormalized) {
+                this.metricsQueue.push(metric);
                 return true;
             } else {
                 this.logger.debug('Metric was discarded due to sample rate.');
@@ -800,15 +778,15 @@ var Metric = function () {
             typeAggregationFrequency = config[type].aggregationFrequency;
         }
 
-        this.tags = this.setTags(options.tags, config.tags, typeTags, config.app);
-        this.aggregations = this.setAggregations(options.aggregations, config.aggregations, typeAggregations);
-        this.aggregationFrequency = this.setAggregationFrequency(options.aggregationFrequency, config.aggregationFrequency, typeAggregationFrequency);
+        this.tags = this.buildTags(options.tags, config.tags, typeTags, config.app);
+        this.aggregations = this.buildAggregations(options.aggregations, config.aggregations, typeAggregations);
+        this.aggregationFrequency = this.buildAggregationFrequency(options.aggregationFrequency, config.aggregationFrequency, typeAggregationFrequency);
         this.namespace = options.namespace || config.namespace;
         this.sampleRate = options.sampleRate || config.sampleRate;
     }
 
     /**
-     * Define tags for a metric type
+     * Build tags for a metric type
      * @param {object} methodTags - list of method tags
      * @param {object} globalTags - list of global tags
      * @param {object} typeTags - list of type tags
@@ -818,8 +796,8 @@ var Metric = function () {
 
 
     createClass(Metric, [{
-        key: 'setTags',
-        value: function setTags() {
+        key: 'buildTags',
+        value: function buildTags() {
             var methodTags = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
             var globalTags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
             var typeTags = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -839,7 +817,7 @@ var Metric = function () {
         }
 
         /**
-         * Define aggregations for a metric type
+         * Build aggregations for a metric type
          * @param {Array} methodAggregations - list of method aggregations
          * @param {Array} globalAggregations - list of global aggregations
          * @param {Array} typeAggregations - list of type aggregations
@@ -847,14 +825,15 @@ var Metric = function () {
          */
 
     }, {
-        key: 'setAggregations',
-        value: function setAggregations() {
+        key: 'buildAggregations',
+        value: function buildAggregations() {
             var methodAggregations = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
             var globalAggregations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
             var typeAggregations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
-            var aggregations = globalAggregations;
+            var aggregations = [];
 
+            aggregations = aggregations.concat(globalAggregations);
             aggregations = aggregations.concat(typeAggregations).filter(this.uniq);
             aggregations = aggregations.concat(methodAggregations).filter(this.uniq);
 
@@ -876,15 +855,15 @@ var Metric = function () {
         }
 
         /**
-         * Define aggregation frequency
+         * Build aggregation frequency
          * @param {number} methodFrequency - method aggregation frequency
          * @param {number} globalFrequency - global aggregation frequency
          * @param {number} typeFrequency - type aggregation frequency
          */
 
     }, {
-        key: 'setAggregationFrequency',
-        value: function setAggregationFrequency(methodFrequency, globalFrequency, typeFrequency) {
+        key: 'buildAggregationFrequency',
+        value: function buildAggregationFrequency(methodFrequency, globalFrequency, typeFrequency) {
             var frequency = methodFrequency || typeFrequency || globalFrequency;
 
             return this.filterAggregationFrequency(frequency);
@@ -915,13 +894,7 @@ var Metric = function () {
     }, {
         key: 'filterAggregationFrequency',
         value: function filterAggregationFrequency(frequency) {
-            var freq = 10;
-
-            if (aggregationFrequencyList.includes(frequency)) {
-                freq = frequency;
-            }
-
-            return freq;
+            return aggregationFrequencyList.includes(frequency) ? frequency : 10;
         }
     }]);
     return Metric;
@@ -988,10 +961,6 @@ var Statful = function () {
                 apiAddress: 'https://beacon.statful.com'
             };
 
-            this.endpoints = {
-                metrics: 'beacon/metrics'
-            };
-
             // Set default properties
             if ((typeof clientConfig === 'undefined' ? 'undefined' : _typeof(clientConfig)) !== 'object' || clientConfig === null) {
                 clientConfig = {};
@@ -1004,16 +973,7 @@ var Statful = function () {
             this.logger = new Logger(this.config.debug);
 
             // Create Util
-            this.util = new StatfulUtil({
-                apiAddress: this.config.apiAddress,
-                debug: this.config.debug,
-                dryrun: this.config.dryrun,
-                flushInterval: this.config.flushInterval,
-                timeout: this.config.timeout
-            });
-
-            //Register queue to send metrics
-            this.util.registerQueue('metrics', this.endpoints.metrics, this.config.flushInterval);
+            this.util = new StatfulUtil(this.config);
         }
 
         /**
@@ -1027,10 +987,10 @@ var Statful = function () {
         value: function measureTimeUserTiming() {
             var measureName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
-            var time = void 0;
             var measure = window.performance.getEntriesByName(measureName).filter(function (entry) {
                 return entry.entryType === 'measure';
             });
+            var time = void 0;
 
             if (measure.length > 0) {
                 // Always use the most recent measure if more exist
@@ -1051,7 +1011,7 @@ var Statful = function () {
         key: 'clearMarks',
         value: function clearMarks(marks) {
             try {
-                if (marks) {
+                if (Array.isArray(marks)) {
                     marks.forEach(function (mark) {
                         if (mark) {
                             window.performance.clearMarks(mark);
@@ -1088,9 +1048,11 @@ var Statful = function () {
         key: 'clearMeasures',
         value: function clearMeasures(measures) {
             try {
-                if (measures) {
+                if (Array.isArray(measures)) {
                     measures.forEach(function (measure) {
-                        window.performance.clearMeasures(measure);
+                        if (measure) {
+                            window.performance.clearMeasures(measure);
+                        }
                     });
                 } else {
                     window.performance.clearMeasures();
@@ -1142,11 +1104,7 @@ var Statful = function () {
                         clearMeasures: false
                     };
 
-                    options = options || {};
-
-                    Object.keys(options).forEach(function (key) {
-                        defaults$$1[key] = options[key];
-                    });
+                    Object.assign(defaults$$1, options);
 
                     // Create endMark if none is set
                     if (!defaults$$1.endMark) {
@@ -1162,7 +1120,7 @@ var Statful = function () {
                     if (time) {
                         // Push metrics to queue
                         var metricItem = new Metric(metricName, 'timer', time, defaults$$1, this.config);
-                        this.util.addItemToQueue('metrics', metricItem);
+                        this.util.addMetricToQueue(metricItem);
                     } else {
                         this.logger.error('Failed to get measure time to register as timer value');
                     }
@@ -1194,19 +1152,14 @@ var Statful = function () {
         value: function timer(metricName, metricValue) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            try {
-                this.logger.debug('Register Timer', metricName, metricValue, options);
-                if (metricName && metricValue >= 0) {
-                    options = options || {};
-
-                    // Push metrics to queue
-                    var item = new Metric(metricName, 'timer', metricValue, options, this.config);
-                    this.util.addItemToQueue('metrics', item);
-                } else {
-                    this.logger.error('Undefined metric name or invalid value to register as a timer');
-                }
-            } catch (ex) {
-                this.logger.error(ex);
+            this.logger.debug('Register Timer', metricName, metricValue, options);
+            if (!isNaN(metricValue) && metricName) {
+                metricValue = Math.abs(metricValue);
+                // Push metrics to queue
+                var item = new Metric(metricName, 'timer', metricValue, options, this.config);
+                this.util.addMetricToQueue(item);
+            } else {
+                this.logger.error('Undefined metric name or invalid value to register as a timer');
             }
         }
 
@@ -1219,31 +1172,26 @@ var Statful = function () {
 
     }, {
         key: 'counter',
-        value: function counter(metricName, metricValue) {
+        value: function counter(metricName) {
+            var metricValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            try {
-                this.logger.debug('Register Counter', metricName, options);
-                metricValue = metricValue || 1;
+            this.logger.debug('Register Counter', metricName, options);
+            if (!isNaN(metricValue) && metricName) {
+                metricValue = Math.abs(parseInt(metricValue, 10));
 
-                if (metricName) {
-                    options = options || {};
-
-                    // Push metrics to queue
-                    var item = new Metric(metricName, 'counter', metricValue, options, this.config);
-                    this.util.addItemToQueue('metrics', item);
-                } else {
-                    this.logger.error('Undefined metric name to register as a counter');
-                }
-            } catch (ex) {
-                this.logger.error(ex);
+                // Push metrics to queue
+                var item = new Metric(metricName, 'counter', metricValue, options, this.config);
+                this.util.addMetricToQueue(item);
+            } else {
+                this.logger.error('Undefined metric name or invalid value to register as a counter');
             }
         }
 
         /**
          * Register gauge
-         * @param {string} metricName metric name to be sent
-         * @param {number} metricValue gauge value to be sent
+         * @param {string} metricName -  metric name to be sent
+         * @param {number} metricValue - gauge value to be sent
          * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
 
@@ -1252,17 +1200,13 @@ var Statful = function () {
         value: function gauge(metricName, metricValue) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            try {
-                this.logger.debug('Register Gauge', metricName, metricValue, options);
-                if (metricName && metricValue) {
-                    // Push metrics to queue
-                    var item = new Metric(metricName, 'gauge', metricValue, options, this.config);
-                    this.util.addItemToQueue('metrics', item);
-                } else {
-                    this.logger.error('Undefined metric name/value to register as a gauge');
-                }
-            } catch (ex) {
-                this.logger.error(ex);
+            this.logger.debug('Register Gauge', metricName, metricValue, options);
+            if (!isNaN(metricValue) && metricName) {
+                // Push metrics to queue
+                var item = new Metric(metricName, 'gauge', metricValue, options, this.config);
+                this.util.addMetricToQueue(item);
+            } else {
+                this.logger.error('Undefined metric name or invalid value to register as a gauge');
             }
         }
     }]);
