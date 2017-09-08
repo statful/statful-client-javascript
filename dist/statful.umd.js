@@ -651,25 +651,27 @@ var StatfulUtil = function () {
         classCallCheck(this, StatfulUtil);
 
         this.config = {};
-        this.listQueues = [];
         Object.assign(this.config, config);
 
         this.logger = new Logger(this.config.debug);
+        if (this.config && this.config.flushInterval) {
+            this.registerQueue(this.config.flushInterval);
+        }
     }
 
     /**
      * Sends HTTP request to the api
-     * @param {string} endpoint - action
-     * @param {string} requestData - request data
+     * @param {object} requestData - request data
      */
 
 
     createClass(StatfulUtil, [{
         key: 'sendRequest',
-        value: function sendRequest(endpoint, requestData) {
+        value: function sendRequest(requestData) {
             var _this = this;
 
-            var requestUrl = this.config.apiAddress + '/' + endpoint;
+            var requestUrl = this.config.apiAddress + '/beacon/metrics';
+            requestData = JSON.stringify(requestData);
 
             this.logger.debug('Request: ${requestUrl}', requestData);
 
@@ -692,36 +694,33 @@ var StatfulUtil = function () {
 
         /**
          * Register a new queue
-         * @param {string} queueName - queue name
-         * @param {string} endpoint - endpoint to send requests
-         * @param {int} timeInterval - interval in milliseconds, default 30000 ms
+         * @param {number} flushInterval
          */
 
     }, {
         key: 'registerQueue',
-        value: function registerQueue(queueName, endpoint, timeInterval) {
+        value: function registerQueue(flushInterval) {
             var _this2 = this;
 
-            timeInterval = timeInterval || this.config.flushInterval;
+            var metricsTimer = void 0;
 
-            if (typeof queueName === 'string' && typeof timeInterval === 'number') {
-                this.listQueues[queueName] = {
-                    data: [],
-                    endpoint: endpoint
-                };
+            this.metricsQueue = [];
 
-                this.listQueues[queueName].timer = setInterval(function () {
-                    var queue = _this2.listQueues[queueName];
-
-                    if (queue.data.length > 0) {
+            if (typeof this.config.flushInterval === 'number' && flushInterval > 0) {
+                metricsTimer = setInterval(function () {
+                    if (_this2.metricsQueue.length > 0) {
                         if (!_this2.config.dryrun) {
-                            _this2.sendRequest(queue.endpoint, JSON.stringify(queue.data));
+                            _this2.sendRequest(_this2.metricsQueue);
                         } else {
-                            _this2.logger.debug('Dryrun data', queue.endpoint, queue.data);
+                            _this2.logger.debug('Dryrun data', _this2.metricsQueue);
                         }
-                        queue.data = [];
+                        _this2.metricsQueue = [];
                     }
-                }, timeInterval);
+                }, flushInterval);
+
+                window.addEventListener('beforeunload', function () {
+                    clearInterval(metricsTimer);
+                });
 
                 return true;
             } else {
@@ -730,34 +729,19 @@ var StatfulUtil = function () {
         }
 
         /**
-         * Unregister queue
-         * @param {string} queueName - queue name
+         * Sends a metric to the queue
+         * @param {object} metric - object to be sent
          */
 
     }, {
-        key: 'unregisterQueue',
-        value: function unregisterQueue(queueName) {
-            if (this.listQueues[queueName]) {
-                clearInterval(this.listQueues[queueName].timer);
-                this.listQueues[queueName] = undefined;
-            }
-        }
+        key: 'addMetricToQueue',
+        value: function addMetricToQueue() {
+            var metric = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        /**
-         * Sends an Item to a specific queue
-         * @param {string} queueName - queue name
-         * @param {object} item - object to be sent
-         */
+            var sampleRateNormalized = (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
-    }, {
-        key: 'addItemToQueue',
-        value: function addItemToQueue(queueName) {
-            var item = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-            var sampleRateNormalized = (item.sampleRate || this.config.sampleRate || 100) / 100;
-
-            if (this.listQueues[queueName] && Math.random() <= sampleRateNormalized) {
-                this.listQueues[queueName].data.push(item);
+            if (Math.random() <= sampleRateNormalized) {
+                this.metricsQueue.push(metric);
                 return true;
             } else {
                 this.logger.debug('Metric was discarded due to sample rate.');
@@ -977,10 +961,6 @@ var Statful = function () {
                 apiAddress: 'https://beacon.statful.com'
             };
 
-            this.endpoints = {
-                metrics: 'beacon/metrics'
-            };
-
             // Set default properties
             if ((typeof clientConfig === 'undefined' ? 'undefined' : _typeof(clientConfig)) !== 'object' || clientConfig === null) {
                 clientConfig = {};
@@ -993,16 +973,7 @@ var Statful = function () {
             this.logger = new Logger(this.config.debug);
 
             // Create Util
-            this.util = new StatfulUtil({
-                apiAddress: this.config.apiAddress,
-                debug: this.config.debug,
-                dryrun: this.config.dryrun,
-                flushInterval: this.config.flushInterval,
-                timeout: this.config.timeout
-            });
-
-            //Register queue to send metrics
-            this.util.registerQueue('metrics', this.endpoints.metrics, this.config.flushInterval);
+            this.util = new StatfulUtil(this.config);
         }
 
         /**
@@ -1149,7 +1120,7 @@ var Statful = function () {
                     if (time) {
                         // Push metrics to queue
                         var metricItem = new Metric(metricName, 'timer', time, defaults$$1, this.config);
-                        this.util.addItemToQueue('metrics', metricItem);
+                        this.util.addMetricToQueue(metricItem);
                     } else {
                         this.logger.error('Failed to get measure time to register as timer value');
                     }
@@ -1186,7 +1157,7 @@ var Statful = function () {
                 metricValue = Math.abs(metricValue);
                 // Push metrics to queue
                 var item = new Metric(metricName, 'timer', metricValue, options, this.config);
-                this.util.addItemToQueue('metrics', item);
+                this.util.addMetricToQueue(item);
             } else {
                 this.logger.error('Undefined metric name or invalid value to register as a timer');
             }
@@ -1211,7 +1182,7 @@ var Statful = function () {
 
                 // Push metrics to queue
                 var item = new Metric(metricName, 'counter', metricValue, options, this.config);
-                this.util.addItemToQueue('metrics', item);
+                this.util.addMetricToQueue(item);
             } else {
                 this.logger.error('Undefined metric name or invalid value to register as a counter');
             }
@@ -1219,8 +1190,8 @@ var Statful = function () {
 
         /**
          * Register gauge
-         * @param {string} metricName metric name to be sent
-         * @param {number} metricValue gauge value to be sent
+         * @param {string} metricName -  metric name to be sent
+         * @param {number} metricValue - gauge value to be sent
          * @param {object} options - set of option (tags, agg, aggFreq, namespace)
          */
 
@@ -1230,10 +1201,10 @@ var Statful = function () {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
             this.logger.debug('Register Gauge', metricName, metricValue, options);
-            if (metricName && metricValue) {
+            if (!isNaN(metricValue) && metricName) {
                 // Push metrics to queue
                 var item = new Metric(metricName, 'gauge', metricValue, options, this.config);
-                this.util.addItemToQueue('metrics', item);
+                this.util.addMetricToQueue(item);
             } else {
                 this.logger.error('Undefined metric name or invalid value to register as a gauge');
             }

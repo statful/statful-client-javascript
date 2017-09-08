@@ -3,19 +3,21 @@ import StatfulLogger from './logger';
 export default class StatfulUtil {
     constructor(config) {
         this.config = {};
-        this.listQueues = [];
         Object.assign(this.config, config);
 
         this.logger = new StatfulLogger(this.config.debug);
+        if (this.config && this.config.flushInterval) {
+            this.registerQueue(this.config.flushInterval);
+        }
     }
 
     /**
      * Sends HTTP request to the api
-     * @param {string} endpoint - action
-     * @param {string} requestData - request data
+     * @param {object} requestData - request data
      */
-    sendRequest(endpoint, requestData) {
-        const requestUrl = `${this.config.apiAddress}/${endpoint}`;
+    sendRequest(requestData) {
+        const requestUrl = `${this.config.apiAddress}/beacon/metrics`;
+        requestData = JSON.stringify(requestData);
 
         this.logger.debug('Request: ${requestUrl}', requestData);
 
@@ -38,32 +40,29 @@ export default class StatfulUtil {
 
     /**
      * Register a new queue
-     * @param {string} queueName - queue name
-     * @param {string} endpoint - endpoint to send requests
-     * @param {int} timeInterval - interval in milliseconds, default 30000 ms
+     * @param {number} flushInterval
      */
-    registerQueue(queueName, endpoint, timeInterval) {
-        timeInterval = timeInterval || this.config.flushInterval;
+    registerQueue(flushInterval) {
+        let metricsTimer;
 
-        if (typeof queueName === 'string' && typeof timeInterval === 'number') {
-            this.listQueues[queueName] = {
-                data: [],
-                endpoint: endpoint
-            };
+        this.metricsQueue = [];
 
-            this.listQueues[queueName].timer = setInterval(() => {
-                let queue = this.listQueues[queueName];
-
-                if (queue.data.length > 0) {
+        if (typeof this.config.flushInterval === 'number' && flushInterval > 0) {
+            metricsTimer = setInterval(() => {
+                if (this.metricsQueue.length > 0) {
                     if (!this.config.dryrun) {
-                        this.sendRequest(queue.endpoint, JSON.stringify(queue.data));
+                        this.sendRequest(this.metricsQueue);
                     } else {
-                        this.logger.debug('Dryrun data', queue.endpoint, queue.data);
+                        this.logger.debug('Dryrun data', this.metricsQueue);
                     }
-                    queue.data = [];
+                    this.metricsQueue = [];
                 }
 
-            }, timeInterval);
+            }, flushInterval);
+
+            window.addEventListener('beforeunload', () => {
+                clearInterval(metricsTimer);
+            });
 
             return true;
         } else {
@@ -72,26 +71,14 @@ export default class StatfulUtil {
     }
 
     /**
-     * Unregister queue
-     * @param {string} queueName - queue name
+     * Sends a metric to the queue
+     * @param {object} metric - object to be sent
      */
-    unregisterQueue(queueName) {
-        if (this.listQueues[queueName]) {
-            clearInterval(this.listQueues[queueName].timer);
-            this.listQueues[queueName] = undefined;
-        }
-    }
+    addMetricToQueue(metric = {}) {
+        const sampleRateNormalized = (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
-    /**
-     * Sends an Item to a specific queue
-     * @param {string} queueName - queue name
-     * @param {object} item - object to be sent
-     */
-    addItemToQueue(queueName, item = {}) {
-        let sampleRateNormalized = (item.sampleRate || this.config.sampleRate || 100) / 100;
-
-        if (this.listQueues[queueName] && Math.random() <= sampleRateNormalized) {
-            this.listQueues[queueName].data.push(item);
+        if (Math.random() <= sampleRateNormalized) {
+            this.metricsQueue.push(metric);
             return true;
         } else {
             this.logger.debug('Metric was discarded due to sample rate.');

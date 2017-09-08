@@ -14,7 +14,7 @@ describe('Statful Util Unit testing', () => {
     it('should to send POST request', () => {
         jasmine.Ajax.install();
 
-        statfulUtil.sendRequest('endpoint', {
+        statfulUtil.sendRequest({
             id: 1
         });
 
@@ -26,7 +26,7 @@ describe('Statful Util Unit testing', () => {
         });
 
         expect(request.method).toBe('POST');
-        expect(request.url).toBe('//beacon.statful.com/endpoint');
+        expect(request.url).toBe('//beacon.statful.com/beacon/metrics');
 
         jasmine.Ajax.uninstall();
     });
@@ -35,22 +35,19 @@ describe('Statful Util Unit testing', () => {
         jasmine.clock().install();
         spyOn(statfulUtil, 'sendRequest');
 
-        expect(statfulUtil.registerQueue('metrics', 'endpoint', 5000)).toEqual(true);
-
-        statfulUtil.addItemToQueue('metrics', {
+        expect(statfulUtil.registerQueue(5000)).toEqual(true);
+        const data = {
             name: 'test',
             type: 'counter',
             value: 1
-        });
+        };
+
+        statfulUtil.addMetricToQueue(data);
         jasmine.clock().tick(5001);
 
-        expect(statfulUtil.sendRequest).toHaveBeenCalledWith('endpoint', '[{"name":"test","type":"counter","value":1}]');
+        expect(statfulUtil.sendRequest).toHaveBeenCalledWith([data]);
 
         jasmine.clock().uninstall();
-    });
-
-    it('should register a new Queue without interval expect default timer 30000', () => {
-        expect(statfulUtil.registerQueue('metrics', 'endpoint')).toEqual(true);
     });
 
     it('should not register a new Queue invalid inputs', () => {
@@ -67,9 +64,9 @@ describe('Statful Util Unit testing', () => {
 
         spyOn(statfulUtil, 'sendRequest');
 
-        statfulUtil.registerQueue('metrics', 'endpoint', 5000);
+        statfulUtil.registerQueue(5000);
 
-        statfulUtil.addItemToQueue('metrics', {
+        statfulUtil.addMetricToQueue({
             name: 'test',
             type: 'counter',
             value: 1
@@ -79,62 +76,16 @@ describe('Statful Util Unit testing', () => {
         expect(statfulUtil.sendRequest.calls.count()).toEqual(0);
 
         jasmine.clock().uninstall();
-    });
-
-    it('should unregister queue', () => {
-        jasmine.clock().install();
-        spyOn(statfulUtil, 'sendRequest');
-
-        statfulUtil.registerQueue('metrics', 'endpoint', 5000);
-
-        jasmine.clock().tick(5001);
-
-        expect(statfulUtil.sendRequest.calls.count()).toEqual(0);
-
-        statfulUtil.addItemToQueue('metrics', {
-            name: 'test',
-            type: 'counter',
-            value: 1
-        });
-
-        statfulUtil.unregisterQueue('metrics');
-
-        jasmine.clock().tick(10001);
-
-        expect(statfulUtil.sendRequest.calls.count()).toEqual(0);
-
-        jasmine.clock().uninstall();
-    });
-
-
-    it('should not unregister queue', () => {
-        expect(statfulUtil.listQueues.length).toEqual(0);
-
-        statfulUtil.unregisterQueue('metrics');
-
-        expect(statfulUtil.listQueues.length).toEqual(0);
-    });
-
-    it('should not add item to queue', () => {
-        expect(statfulUtil.listQueues.length).toEqual(0);
-
-        statfulUtil.addItemToQueue('metrics', {
-            name: 'test',
-            type: 'counter',
-            value: 1
-        });
-
-        expect(statfulUtil.listQueues.length).toEqual(0);
     });
 
     it('should not add items to queue (sample rate)', () => {
-        expect(statfulUtil.listQueues.length).toEqual(0);
+        expect(statfulUtil.metricsQueue.length).toEqual(0);
 
-        expect(statfulUtil.registerQueue('metrics', 'endpoint', 5000)).toEqual(true);
+        expect(statfulUtil.registerQueue(5000)).toEqual(true);
 
         spyOn(Math, 'random').and.returnValue(0.5);
 
-        expect(statfulUtil.addItemToQueue('metrics', {
+        expect(statfulUtil.addMetricToQueue({
             name: 'test',
             type: 'counter',
             value: 1,
@@ -143,13 +94,13 @@ describe('Statful Util Unit testing', () => {
     });
 
     it('should add items to queue (sample rate)', () => {
-        expect(statfulUtil.listQueues.length).toEqual(0);
+        expect(statfulUtil.metricsQueue.length).toEqual(0);
 
-        expect(statfulUtil.registerQueue('metrics', 'endpoint', 5000)).toEqual(true);
+        expect(statfulUtil.registerQueue(5000)).toEqual(true);
 
         spyOn(Math, 'random').and.returnValue(0.5);
 
-        expect(statfulUtil.addItemToQueue('metrics', {
+        expect(statfulUtil.addMetricToQueue({
             name: 'test',
             type: 'counter',
             value: 1,
