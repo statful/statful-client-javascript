@@ -13,6 +13,7 @@ module.exports = function(config) {
         files: [
             { pattern: require.resolve('usertiming'), include: false },
             { pattern: require.resolve('jasmine-ajax'), include: true },
+            { pattern: 'node_modules/babel-polyfill/browser.js', instrument: false},
             { pattern: 'tests/*.tests.js', included: true }
         ],
 
