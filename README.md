@@ -159,7 +159,7 @@ You can omit both start and end mark names:
 ### Installation
 
 ```bash
-$ npm install
+$ yarn install
 ```
 
 ### Tests

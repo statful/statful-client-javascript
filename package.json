@@ -22,13 +22,14 @@
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
-    "eslint": "^4.5.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.9.0",
     "jasmine-ajax": "^3.3.1",
-    "jasmine-core": "^2.7.0",
-    "karma": "^1.7.0",
+    "jasmine-core": "^2.8.0",
+    "karma": "^1.7.1",
     "karma-coverage": "^1.1.1",
     "karma-jasmine": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.4",
@@ -36,9 +37,10 @@
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-istanbul": "^1.1.0",
-    "rollup-plugin-license": "^0.4.0",
+    "rollup-plugin-license": "^0.5.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-uglify": "^2.0.1",
     "usertiming": "^0.1.8"
-  }
+  },
+  "dependencies": {}
 }
