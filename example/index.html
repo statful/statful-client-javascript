@@ -17,23 +17,47 @@
     </style>
 </head>
 <body>
-    <button onclick="timer()">Send Timer</button>
-    <button onclick="count()">Send Count</button>
-    <button onclick="gauge()">Send Gauge</button>
+    <div>
+        <h1>Using Queue</h1>
+        <button onclick="timer()">Send Timer</button>
+        <button onclick="count()">Send Count</button>
+        <button onclick="gauge()">Send Gauge</button>
+    </div>
+
+    <div>
+        <h1>Direct send metric</h1>
+        <button onclick="timer(true)">Send Timer</button>
+        <button onclick="count(true)">Send Count</button>
+        <button onclick="gauge(true)">Send Gauge</button>
+    </div>
+
 
     <script type="text/javascript" src="../dist/statful.js"></script>
 
     <script>
-        function timer() {
-            statful.timer('timer-click', new Date());
+        function timer(direct) {
+            if (direct) {
+                statful.sendMetric('timer', 'timer-click', new Date());
+            } else {
+                statful.timer('timer-click', new Date());
+            }
         }
 
-        function count() {
-            statful.counter('counter-click');
+        function count(direct) {
+            if (direct) {
+                statful.sendMetric('counter', 'counter-click');
+            } else {
+                statful.counter('counter-click');
+            }
+
         }
 
-        function gauge() {
-            statful.gauge('gauge-click', 10);
+        function gauge(direct) {
+            if (direct) {
+                statful.sendMetric('gauge', 'gauge-click', 10);
+            } else {
+                statful.gauge('gauge-click', 10);
+            }
         }
 
         statful.initialize({

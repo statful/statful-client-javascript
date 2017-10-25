@@ -1,4 +1,5 @@
 import StatfulUtil from '../src/statful-util';
+import Metric from '../src/metric.model';
 
 describe('Statful Util Unit testing', () => {
     let statfulUtil;
@@ -14,7 +15,7 @@ describe('Statful Util Unit testing', () => {
     it('should to send POST request', () => {
         jasmine.Ajax.install();
 
-        statfulUtil.sendRequest({
+        statfulUtil.sendData({
             id: 1
         });
 
@@ -33,78 +34,99 @@ describe('Statful Util Unit testing', () => {
 
     it('should register a new Queue and send data', () => {
         jasmine.clock().install();
-        spyOn(statfulUtil, 'sendRequest');
+        spyOn(statfulUtil, 'sendData');
 
         expect(statfulUtil.registerQueue(5000)).toEqual(true);
-        const data = {
-            name: 'test',
-            type: 'counter',
-            value: 1
-        };
 
-        statfulUtil.addMetricToQueue(data);
+        const metricModel = new Metric('name', 'counter', 2);
+
+        statfulUtil.addMetric(metricModel, true);
         jasmine.clock().tick(5001);
 
-        expect(statfulUtil.sendRequest).toHaveBeenCalledWith([data]);
+        expect(statfulUtil.sendData).toHaveBeenCalledWith([metricModel]);
 
         jasmine.clock().uninstall();
     });
 
     it('should not register a new Queue invalid inputs', () => {
-        expect(statfulUtil.registerQueue([], 'endpoint')).toEqual(false);
+        expect(statfulUtil.registerQueue(0)).toEqual(false);
     });
 
-    it('should register a new Queue and not send data', () => {
-        jasmine.clock().install();
+    it('should not add metric - invalid', () => {
+        const metricModel = new Metric('', 'counter', 2);
 
+        statfulUtil.registerQueue(0);
+
+        spyOn(statfulUtil, 'sendData');
+        statfulUtil.addMetric(metricModel, true);
+
+        expect(statfulUtil.metricsQueue).toEqual([]);
+        expect(statfulUtil.sendData).not.toHaveBeenCalled();
+    });
+
+    it('should not add metric - sample Rate', () => {
+        const metricModel = new Metric('name', 'counter', 2);
+
+        statfulUtil.registerQueue(0);
+
+        spyOn(statfulUtil, 'sendData');
+        spyOn(statfulUtil, 'shouldAddMetric').and.returnValue(false);
+        statfulUtil.addMetric(metricModel, true);
+
+        expect(statfulUtil.metricsQueue).toEqual([]);
+        expect(statfulUtil.sendData).not.toHaveBeenCalled();
+    });
+
+    it('should add metric to queue', () => {
+        const metricModel = new Metric('name', 'counter', 2);
+        statfulUtil.registerQueue(0);
+
+        spyOn(statfulUtil, 'sendData');
+        statfulUtil.addMetric(metricModel, true);
+
+        expect(statfulUtil.metricsQueue).toEqual([metricModel]);
+        expect(statfulUtil.sendData).not.toHaveBeenCalled();
+    });
+
+    it('should add metric and send to server', () => {
+        const metricModel = new Metric('name', 'counter', 2);
+        statfulUtil.registerQueue(0);
+
+        spyOn(statfulUtil, 'sendData');
+        statfulUtil.addMetric(metricModel, false);
+
+        expect(statfulUtil.metricsQueue).toEqual([]);
+        expect(statfulUtil.sendData).toHaveBeenCalledWith([metricModel]);
+    });
+
+
+    it('should not add metric - metric sample rate', () => {
+        const metricModel = new Metric('name', 'counter', 2, {sampleRate: 50});
+
+        spyOn(Math, 'random').and.returnValue(0.6);
+        expect(statfulUtil.shouldAddMetric(metricModel)).toEqual(false);
+    });
+
+    it('should not add metric - metric sample rate', () => {
         statfulUtil = new StatfulUtil({
             apiAddress: '//beacon.statful.com',
-            dryrun: true
+            flushInterval: 30000,
+            sampleRate: 50
         });
+        const metricModel = new Metric('name', 'counter', 2, {});
 
-        spyOn(statfulUtil, 'sendRequest');
-
-        statfulUtil.registerQueue(5000);
-
-        statfulUtil.addMetricToQueue({
-            name: 'test',
-            type: 'counter',
-            value: 1
-        });
-        jasmine.clock().tick(5001);
-
-        expect(statfulUtil.sendRequest.calls.count()).toEqual(0);
-
-        jasmine.clock().uninstall();
+        spyOn(Math, 'random').and.returnValue(0.6);
+        expect(statfulUtil.shouldAddMetric(metricModel)).toEqual(false);
     });
 
-    it('should not add items to queue (sample rate)', () => {
-        expect(statfulUtil.metricsQueue.length).toEqual(0);
+    it('should add metric - without specifying sample rate', () => {
+        statfulUtil = new StatfulUtil({
+            apiAddress: '//beacon.statful.com',
+            flushInterval: 30000
+        });
+        const metricModel = new Metric('name', 'counter', 2, {});
 
-        expect(statfulUtil.registerQueue(5000)).toEqual(true);
-
-        spyOn(Math, 'random').and.returnValue(0.5);
-
-        expect(statfulUtil.addMetricToQueue({
-            name: 'test',
-            type: 'counter',
-            value: 1,
-            sampleRate: 40
-        })).toBeFalsy();
-    });
-
-    it('should add items to queue (sample rate)', () => {
-        expect(statfulUtil.metricsQueue.length).toEqual(0);
-
-        expect(statfulUtil.registerQueue(5000)).toEqual(true);
-
-        spyOn(Math, 'random').and.returnValue(0.5);
-
-        expect(statfulUtil.addMetricToQueue({
-            name: 'test',
-            type: 'counter',
-            value: 1,
-            sampleRate: 60
-        })).toBeTruthy();
+        spyOn(Math, 'random').and.returnValue(0.6);
+        expect(statfulUtil.shouldAddMetric(metricModel)).toEqual(true);
     });
 });

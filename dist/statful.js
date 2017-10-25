@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 2.0.3
+* statful-client-javascript 2.0.4
 * Copyright 2017 Statful <https://www.statful.com/>
 */
 
@@ -657,36 +657,38 @@ var StatfulUtil = function () {
     }
 
     /**
-     * Sends HTTP request to the api
-     * @param {object} requestData - request data
+     * Sends data
+     * @param {object} data
      */
 
 
     createClass(StatfulUtil, [{
-        key: 'sendRequest',
-        value: function sendRequest(requestData) {
+        key: 'sendData',
+        value: function sendData(data) {
             var _this = this;
 
             var requestUrl = this.config.apiAddress + '/beacon/metrics';
-            requestData = JSON.stringify(requestData);
+            var requestData = JSON.stringify(data);
 
-            this.logger.debug('Request: ${requestUrl}', requestData);
+            if (!this.config.dryrun) {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open('POST', requestUrl, true);
+                xmlHttp.timeout = this.config.timeout;
 
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open('POST', requestUrl, true);
-            xmlHttp.timeout = this.config.timeout;
+                //Send the proper header information along with the request
+                xmlHttp.setRequestHeader('Content-type', 'application/json');
+                xmlHttp.send(requestData);
 
-            //Send the proper header information along with the request
-            xmlHttp.setRequestHeader('Content-type', 'application/json');
-            xmlHttp.send(requestData);
-
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.status == 200 || xmlHttp.status == 201) {
-                    _this.logger.debug('Successfully send metric');
-                } else {
-                    _this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
-                }
-            };
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.status == 200 || xmlHttp.status == 201) {
+                        _this.logger.debug('Successfully send metric');
+                    } else {
+                        _this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
+                    }
+                };
+            } else {
+                this.logger.debug('Dryrun data', data);
+            }
         }
 
         /**
@@ -703,14 +705,10 @@ var StatfulUtil = function () {
 
             this.metricsQueue = [];
 
-            if (typeof this.config.flushInterval === 'number' && flushInterval > 0) {
+            if (typeof flushInterval === 'number' && flushInterval > 0) {
                 metricsTimer = setInterval(function () {
                     if (_this2.metricsQueue.length > 0) {
-                        if (!_this2.config.dryrun) {
-                            _this2.sendRequest(_this2.metricsQueue);
-                        } else {
-                            _this2.logger.debug('Dryrun data', _this2.metricsQueue);
-                        }
+                        _this2.sendData(_this2.metricsQueue);
                         _this2.metricsQueue = [];
                     }
                 }, flushInterval);
@@ -726,24 +724,45 @@ var StatfulUtil = function () {
         }
 
         /**
-         * Sends a metric to the queue
+         * Add Metric
+         * @param {object} metric - object to be sent
+         * @param {Boolean} usingQueue
+         */
+
+    }, {
+        key: 'addMetric',
+        value: function addMetric() {
+            var metric = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            var usingQueue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+            if (metric && typeof metric.isValid === 'function' && metric.isValid()) {
+                if (this.shouldAddMetric(metric)) {
+                    if (usingQueue) {
+                        this.metricsQueue.push(metric);
+                    } else {
+                        this.sendData([metric]);
+                    }
+                } else {
+                    this.logger.debug('Metric was discarded due to sample rate.');
+                }
+            } else {
+                this.logger.error('Invalid metric.');
+            }
+        }
+
+        /**
+         * Determines is a metric should be sent to the server
          * @param {object} metric - object to be sent
          */
 
     }, {
-        key: 'addMetricToQueue',
-        value: function addMetricToQueue() {
+        key: 'shouldAddMetric',
+        value: function shouldAddMetric() {
             var metric = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-            var sampleRateNormalized = (metric.sampleRate || this.config.sampleRate || 100) / 100;
+            var sampleRate = (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
-            if (Math.random() <= sampleRateNormalized) {
-                this.metricsQueue.push(metric);
-                return true;
-            } else {
-                this.logger.debug('Metric was discarded due to sample rate.');
-                return false;
-            }
+            return Math.random() <= sampleRate;
         }
     }]);
     return StatfulUtil;
@@ -892,6 +911,17 @@ var Metric = function () {
         key: 'filterAggregationFrequency',
         value: function filterAggregationFrequency(frequency) {
             return aggregationFrequencyList.includes(frequency) ? frequency : 10;
+        }
+
+        /**
+         * Validates metric model
+         * @returns {Boolean}
+         */
+
+    }, {
+        key: 'isValid',
+        value: function isValid() {
+            return !!(!isNaN(this.value) && this.name);
         }
     }]);
     return Metric;
@@ -1117,7 +1147,7 @@ var Statful = function () {
                     if (time) {
                         // Push metrics to queue
                         var metricItem = new Metric(metricName, 'timer', time, defaults$$1, this.config);
-                        this.util.addMetricToQueue(metricItem);
+                        this.util.addMetric(metricItem, true);
                     } else {
                         this.logger.error('Failed to get measure time to register as timer value');
                     }
@@ -1150,14 +1180,9 @@ var Statful = function () {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
             this.logger.debug('Register Timer', metricName, metricValue, options);
-            if (!isNaN(metricValue) && metricName) {
-                metricValue = Math.abs(metricValue);
-                // Push metrics to queue
-                var item = new Metric(metricName, 'timer', metricValue, options, this.config);
-                this.util.addMetricToQueue(item);
-            } else {
-                this.logger.error('Undefined metric name or invalid value to register as a timer');
-            }
+            var metric = new Metric(metricName, 'timer', metricValue, options, this.config);
+
+            this.util.addMetric(metric, true);
         }
 
         /**
@@ -1174,15 +1199,10 @@ var Statful = function () {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
             this.logger.debug('Register Counter', metricName, options);
-            if (!isNaN(metricValue) && metricName) {
-                metricValue = Math.abs(parseInt(metricValue, 10));
+            var metric = new Metric(metricName, 'counter', metricValue, options, this.config);
+            metric.value = Math.abs(parseInt(metric.value, 10));
 
-                // Push metrics to queue
-                var item = new Metric(metricName, 'counter', metricValue, options, this.config);
-                this.util.addMetricToQueue(item);
-            } else {
-                this.logger.error('Undefined metric name or invalid value to register as a counter');
-            }
+            this.util.addMetric(metric, true);
         }
 
         /**
@@ -1198,13 +1218,27 @@ var Statful = function () {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
             this.logger.debug('Register Gauge', metricName, metricValue, options);
-            if (!isNaN(metricValue) && metricName) {
-                // Push metrics to queue
-                var item = new Metric(metricName, 'gauge', metricValue, options, this.config);
-                this.util.addMetricToQueue(item);
-            } else {
-                this.logger.error('Undefined metric name or invalid value to register as a gauge');
-            }
+            var metric = new Metric(metricName, 'gauge', metricValue, options, this.config);
+
+            this.util.addMetric(metric, true);
+        }
+
+        /**
+         * Send Metric without going to Queue
+         * @param {string} type -  metric type to be sent
+         * @param {string} metricName -  metric name to be sent
+         * @param {number} metricValue - gauge value to be sent
+         * @param {object} options - set of option (tags, agg, aggFreq, namespace)
+         */
+
+    }, {
+        key: 'sendMetric',
+        value: function sendMetric(type, metricName, metricValue) {
+            var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+            var metric = new Metric(metricName, type, metricValue, options, this.config);
+
+            this.util.addMetric(metric, false);
         }
     }]);
     return Statful;

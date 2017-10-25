@@ -103,4 +103,12 @@ export default class Metric {
     filterAggregationFrequency(frequency) {
         return (aggregationFrequencyList.includes(frequency)) ? frequency : 10;
     }
+
+    /**
+     * Validates metric model
+     * @returns {Boolean}
+     */
+    isValid() {
+        return !!(!isNaN(this.value) && this.name);
+    }
 }
