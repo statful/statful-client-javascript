@@ -186,19 +186,15 @@ describe('Statful Client Unit testing', () => {
     it('should clear all performance marks when calling clearMarks without arguments', () => {
         statful.initialize();
 
-        statful.registerMark('start_test');
-
         spyOn(window.performance, 'clearMarks');
 
         statful.clearMarks();
 
-        expect(window.performance.clearMarks).toHaveBeenCalled();
+        expect(window.performance.clearMarks).toHaveBeenCalledWith();
     });
 
     it('should clear performance marks when calling clearMarks with an Array of marks', () => {
         statful.initialize();
-
-        statful.registerMark('start_test');
 
         spyOn(window.performance, 'clearMarks');
 
@@ -214,19 +210,17 @@ describe('Statful Client Unit testing', () => {
 
         statful.clearMeasures();
 
-        expect(window.performance.clearMeasures).toHaveBeenCalled();
+        expect(window.performance.clearMeasures).toHaveBeenCalledWith();
     });
 
-    it('should clear performance measures when calling clearMeasures with an Array of measures', () => {
+    it('should clear performance measures when calling clearMeasures with an Array of marks', () => {
         statful.initialize();
 
-        statful.registerMeasure('measure', 'metric');
+        spyOn(window.performance, 'clearMeasures');
 
-        spyOn(window.performance, 'clearMarks');
+        statful.clearMeasures(['start_test']);
 
-        statful.clearMarks(['measure']);
-
-        expect(window.performance.clearMarks).toHaveBeenCalledWith('measure');
+        expect(window.performance.clearMeasures).toHaveBeenCalledWith('start_test');
     });
 
     it('should add a performance mark when calling registerMark', () => {
@@ -237,6 +231,16 @@ describe('Statful Client Unit testing', () => {
         statful.registerMark('mark_test');
 
         expect(window.performance.mark).toHaveBeenCalledWith('mark_test');
+    });
+
+    it('should not add a performance mark when calling registerMark', () => {
+        statful.initialize();
+
+        spyOn(window.performance, 'mark');
+
+        statful.registerMark();
+
+        expect(window.performance.mark).not.toHaveBeenCalled();
     });
 
     it('should add a performance measure when calling registerMeasure', () => {

@@ -1,4 +1,3 @@
-import 'usertiming';
 import StatfulLogger from './logger';
 import StatfulUtil from './statful-util';
 import Metric from './metric.model';
@@ -106,17 +105,6 @@ export default class Statful {
             } else {
                 window.performance.clearMarks();
             }
-        } catch (ex) {
-            this.logger.error(ex);
-        }
-    }
-
-    /**
-     * Clear resources
-     */
-    static clearResources() {
-        try {
-            window.performance.clearResourceTimings();
         } catch (ex) {
             this.logger.error(ex);
         }

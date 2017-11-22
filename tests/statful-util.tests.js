@@ -12,7 +12,23 @@ describe('Statful Util Unit testing', () => {
         });
     });
 
-    it('should to send POST request', () => {
+    it('should not send POST request - Dry Run', () => {
+        statfulUtil = new StatfulUtil({
+            dryrun: true
+        });
+        jasmine.Ajax.install();
+
+        statfulUtil.sendData({
+            id: 1
+        });
+
+        const request = jasmine.Ajax.requests.mostRecent();
+        expect(request).toEqual(undefined);
+
+        jasmine.Ajax.uninstall();
+    });
+
+    it('should send POST request', () => {
         jasmine.Ajax.install();
 
         statfulUtil.sendData({

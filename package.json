@@ -1,6 +1,6 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
@@ -26,7 +26,7 @@
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "eslint": "^4.9.0",
+    "eslint": "^4.11.0",
     "jasmine-ajax": "^3.3.1",
     "jasmine-core": "^2.8.0",
     "karma": "^1.7.1",
