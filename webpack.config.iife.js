@@ -9,11 +9,28 @@ module.exports = () => {
             'statful': './src/statful.js',
         },
         output: {
-            path: path.resolve(__dirname, 'build'),
+            path: path.resolve(__dirname, 'dist'),
             filename: '[name].min.js'
         },
         plugins: [
             new webpack.BannerPlugin(banner)
-        ]
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.(js)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                presets: ['env'],
+                                plugins: ['babel-plugin-add-module-exports']
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
     };
 };

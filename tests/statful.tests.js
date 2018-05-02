@@ -253,7 +253,7 @@ describe('Statful Client Unit testing', () => {
         expect(window.performance.measure).toHaveBeenCalledWith('measure_test', undefined, jasmine.any(String));
     });
 
-    it('should call addMetric when registerMeasure', () => {
+    it('should call addMetric when registerMeasure', (done) => {
         statful.initialize();
 
         statful.registerMark('start_test');
@@ -275,6 +275,7 @@ describe('Statful Client Unit testing', () => {
             statful.registerMeasure('measure_test', 'metric_test', options);
 
             expect(util.addMetric).toHaveBeenCalled();
+            done();
         }, 50);
     });
 

@@ -9,14 +9,30 @@ module.exports = () => {
             'statful': './src/statful.js',
         },
         output: {
-            path: path.resolve(__dirname, 'build'),
+            path: path.resolve(__dirname, 'dist'),
             filename: '[name].umd.min.js',
             library: 'statful',
-            libraryTarget: 'var',
-            umdNamedDefine: true
+            libraryTarget: 'umd'
         },
         plugins: [
             new webpack.BannerPlugin(banner)
-        ]
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.(js)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                presets: ['env'],
+                                plugins: ['babel-plugin-add-module-exports']
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
     };
 };
