@@ -69,13 +69,6 @@ export default class Statful {
  
         // Create Util
         this.util = new StatfulUtil(this.config);
-
-        //Inject preconnect link
-        const linkElement = document.createElement('link');
-        linkElement.rel = 'preconnect';
-        linkElement.href = this.config.apiAddress;
-
-        document.getElementsByTagName('head')[0].appendChild(linkElement);
     }
 
     /**
