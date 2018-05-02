@@ -4,9 +4,7 @@
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
-    "eslint": "eslint .",
-    "karma": "karma start --single-run",
+    "build": "webpack -p --progress --mode production --config webpack.config.umd.js && webpack -p --progress --mode production --config webpack.config.iife.js",
     "test": "npm run eslint && npm run karma"
   },
   "repository": {
@@ -36,13 +34,9 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-rollup-preprocessor": "^4.0.3",
     "moment": "^2.22.1",
-    "rollup": "^0.45.2",
-    "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-istanbul": "^1.1.0",
-    "rollup-plugin-license": "^0.5.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-uglify": "^2.0.1",
-    "usertiming": "^0.1.8"
+    "usertiming": "^0.1.8",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2"
   },
   "dependencies": {}
 }

@@ -24,29 +24,6 @@ module.exports = function(config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['progress', 'coverage'],
-
-        preprocessors: {
-            // source files, that you wanna generate coverage for
-            // do not include tests or libraries
-            // (these files will be instrumented by Istanbul)
-            'tests/*.tests.js': ['rollup']
-        },
-
-        rollupPreprocessor: {
-            plugins: [
-                require('rollup-plugin-istanbul')({
-                    exclude: [
-                        'tests/*.js',
-                        'node_modules/usertiming/src/usertiming.js'
-                    ]
-                }),
-                require('rollup-plugin-node-resolve')(),
-                require('rollup-plugin-babel')()
-            ],
-            format: 'iife', // Helps prevent naming collisions.
-            moduleName: 'statful', // Required for 'iife' format.
-            sourceMap: 'inline' // Sensible for testing.
-        },
         coverageReporter: {
             reporters: [
                 {
