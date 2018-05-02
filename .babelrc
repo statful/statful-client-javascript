@@ -1,6 +1,14 @@
 {
-  "presets": [
-    ["env", { modules: false }]
-  ],
-  "plugins": ["external-helpers"]
+    "presets": [
+        [
+            "env",
+            {
+                "modules": false
+            }
+        ]
+    ],
+    "plugins": [
+        "external-helpers",
+        "transform-object-assign"
+    ]
 }

@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 2.1.2
+* statful-client-javascript 2.1.3
 * Copyright 2018 Statful <https://www.statful.com/>
 */
 
@@ -49,6 +49,26 @@ var createClass = function () {
   };
 }();
 
+
+
+
+
+
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 /* eslint-disable no-console */
 var Logger = function () {
     function Logger(enableDebug) {
@@ -87,7 +107,7 @@ var StatfulUtil = function () {
         classCallCheck(this, StatfulUtil);
 
         this.config = {};
-        Object.assign(this.config, config);
+        _extends(this.config, config);
 
         this.logger = new Logger(this.config.debug);
         if (this.config && this.config.flushInterval) {
@@ -260,9 +280,9 @@ var Metric = function () {
 
             var tags = {};
 
-            Object.assign(tags, globalTags);
-            Object.assign(tags, typeTags);
-            Object.assign(tags, methodTags);
+            _extends(tags, globalTags);
+            _extends(tags, typeTags);
+            _extends(tags, methodTags);
 
             if (!tags.app && app) {
                 tags.app = app;
@@ -432,8 +452,8 @@ var Statful = function () {
                 clientConfig = {};
             }
 
-            Object.assign(this.config, defaultConfig);
-            Object.assign(this.config, clientConfig);
+            _extends(this.config, defaultConfig);
+            _extends(this.config, clientConfig);
 
             // Create Logger
             this.logger = new Logger(this.config.debug);
@@ -563,7 +583,7 @@ var Statful = function () {
                         clearMeasures: false
                     };
 
-                    Object.assign(defaults$$1, options);
+                    _extends(defaults$$1, options);
 
                     // Create endMark if none is set
                     if (!defaults$$1.endMark) {
