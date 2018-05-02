@@ -1,6 +1,6 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
@@ -34,6 +34,7 @@
     "karma-jasmine": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-rollup-preprocessor": "^4.0.3",
+    "moment": "^2.22.1",
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-istanbul": "^1.1.0",

@@ -1,5 +1,5 @@
 /**
-* statful-client-javascript 2.1.1
+* statful-client-javascript 2.1.2
 * Copyright 2018 Statful <https://www.statful.com/>
 */
 
@@ -437,6 +437,13 @@ var Statful = function () {
 
             // Create Util
             this.util = new StatfulUtil(this.config);
+
+            //Inject preconnect link
+            var linkElement = document.createElement('link');
+            linkElement.rel = 'preconnect';
+            linkElement.href = this.config.apiAddress;
+
+            document.getElementsByTagName('head')[0].appendChild(linkElement);
         }
 
         /**
