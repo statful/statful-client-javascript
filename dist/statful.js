@@ -1,6 +1,6 @@
 /**
-* statful-client-javascript 2.1.0
-* Copyright 2017 Statful <https://www.statful.com/>
+* statful-client-javascript 2.1.1
+* Copyright 2018 Statful <https://www.statful.com/>
 */
 
 var statful = (function () {

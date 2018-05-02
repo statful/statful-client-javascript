@@ -1,8 +1,8 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Statful client for Javascript applications",
-  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2017 Statful <https://www.statful.com/>\n*/\n",
+  "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
     "build": "NODE_ENV=production rollup -c",
     "eslint": "eslint .",
@@ -29,7 +29,7 @@
     "eslint": "^4.19.1",
     "jasmine-ajax": "^3.3.1",
     "jasmine-core": "^3.1.0",
-    "karma": "^2.0.0",
+    "karma": "^2.0.2",
     "karma-coverage": "^1.1.1",
     "karma-jasmine": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
