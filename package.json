@@ -4,7 +4,7 @@
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
+    "build": "webpack -p --progress --mode production --config webpack.config.umd.js && webpack -p --progress --mode production --config webpack.config.iife.js",
     "eslint": "eslint .",
     "karma": "karma start --single-run",
     "test": "npm run eslint && npm run karma"
@@ -15,34 +15,34 @@
   },
   "author": "Jose Tavares <jose.tavares@mindera.com>",
   "license": "MIT",
-  "main": "dist/statful.js",
-  "browser": "dist/statful.umd.js",
+  "main": "dist/statful.min.js",
+  "browser": "dist/statful.umd.min.js",
   "bugs": {
     "url": "https://github.com/statful/statful-client-javascript/issues"
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "eslint": "^4.19.1",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^3.3.1",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.2",
     "karma-coverage": "^1.1.1",
+    "karma-coverage-istanbul-reporter": "^1.4.2",
     "karma-jasmine": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
-    "karma-rollup-preprocessor": "^4.0.3",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^3.0.0",
     "moment": "^2.22.1",
-    "rollup": "^0.45.2",
-    "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-istanbul": "^1.1.0",
-    "rollup-plugin-license": "^0.5.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-uglify": "^2.0.1",
-    "usertiming": "^0.1.8"
+    "usertiming": "^0.1.8",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2"
   },
   "dependencies": {}
 }

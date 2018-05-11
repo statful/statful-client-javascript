@@ -51,7 +51,7 @@ export default class Statful {
      * Initialize the Statful client settings and register events
      * @param {Object} clientConfig
      */
-    static initialize(clientConfig) {
+    static initialize (clientConfig) {
         this.config = {
             apiAddress: 'https://beacon.statful.com'
         };
@@ -66,7 +66,7 @@ export default class Statful {
 
         // Create Logger
         this.logger = new StatfulLogger(this.config.debug);
-
+ 
         // Create Util
         this.util = new StatfulUtil(this.config);
     }
@@ -76,7 +76,7 @@ export default class Statful {
      * @param {string} measureName name of the measure to create
      * @returns {number}
      */
-    static measureTimeUserTiming(measureName = '') {
+    static measureTimeUserTiming (measureName = '') {
         const measure = window.performance.getEntriesByName(measureName).filter((entry) => entry.entryType === 'measure');
         let time;
 
@@ -94,7 +94,7 @@ export default class Statful {
      * Clear marks
      * @param {Array} marks - list of marks to clear (optional)
      */
-    static clearMarks(marks) {
+    static clearMarks (marks) {
         try {
             if (Array.isArray(marks)) {
                 marks.forEach((mark) => {
@@ -114,7 +114,7 @@ export default class Statful {
      * Clear measures
      * @param {Array} measures - list of measures to clear (optional)
      */
-    static clearMeasures(measures) {
+    static clearMeasures (measures) {
         try {
             if (Array.isArray(measures)) {
                 measures.forEach((measure) => {
@@ -134,7 +134,7 @@ export default class Statful {
      * Register a mark using the user timing specification
      * @param markName - name of the mark to add
      */
-    static registerMark(markName = '') {
+    static registerMark (markName = '') {
         try {
             this.logger.debug('Register Mark', markName);
             if (markName) {
@@ -153,7 +153,7 @@ export default class Statful {
      * @param {string} metricName - name of the metric to send to statful (ie. timeto)
      * @param {object} options - set of option (clearMarks, clearMeasures, startMark, endMark, tags and aggregations)
      */
-    static registerMeasure(measureName, metricName, options = {}) {
+    static registerMeasure (measureName, metricName, options = {}) {
         try {
             this.logger.debug('Register Measure', measureName, metricName, options);
             if (measureName) {
@@ -204,7 +204,7 @@ export default class Statful {
      * @param {number} metricValue - timer value to be sent
      * @param {object} options - set of option (tags, agg, aggFreq, namespace)
      */
-    static timer(metricName, metricValue, options = {}) {
+    static timer (metricName, metricValue, options = {}) {
         this.logger.debug('Register Timer', metricName, metricValue, options);
         let metric = new Metric(metricName, 'timer', metricValue, options, this.config);
 
@@ -217,7 +217,7 @@ export default class Statful {
      * @param {number} metricValue - count value to be sent
      * @param {object} options - set of option (tags, agg, aggFreq, namespace)
      */
-    static counter(metricName, metricValue = 1, options = {}) {
+    static counter (metricName, metricValue = 1, options = {}) {
         this.logger.debug('Register Counter', metricName, options);
         let metric = new Metric(metricName, 'counter', metricValue, options, this.config);
         metric.value = Math.abs(parseInt(metric.value, 10));
@@ -231,7 +231,7 @@ export default class Statful {
      * @param {number} metricValue - gauge value to be sent
      * @param {object} options - set of option (tags, agg, aggFreq, namespace)
      */
-    static gauge(metricName, metricValue, options = {}) {
+    static gauge (metricName, metricValue, options = {}) {
         this.logger.debug('Register Gauge', metricName, metricValue, options);
         let metric = new Metric(metricName, 'gauge', metricValue, options, this.config);
 
