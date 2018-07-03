@@ -1,5 +1,5 @@
 # statful-client-javascript
-Staful client for Javascript. This client is intended to gather metrics and send them to Statful.
+Statful client for Javascript. This client is intended to gather metrics and send them to Statful.
 
 [![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://travis-ci.org/statful/statful-client-javascript)
 [![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
@@ -79,9 +79,9 @@ The custom options that can be set on config param are detailed below.
 ### Methods
 
 ```javascript
-- staful.counter('myCounter', 1, {agg: ['sum']});
-- staful.gauge('myGauge', 10, { tags: { host: 'localhost' } });
-- staful.timer('myCounter', 200, {namespace: 'sandbox'});
+- statful.counter('myCounter', 1, {agg: ['sum']});
+- statful.gauge('myGauge', 10, { tags: { host: 'localhost' } });
+- statful.timer('myCounter', 200, {namespace: 'sandbox'});
 ```
 These methods receive a metric name and a metric value as arguments and send a counter/gauge/timer metric.
  
@@ -90,7 +90,7 @@ If the options parameter is omitted, the default values are used.
 These methods will add metrics to a queue that will be flushed using the interval defined on flushInterval.
  
 ```javascript
-- staful.sendMetric('counter', 'myCounter', 1, {agg: ['sum']});
+- statful.sendMetric('counter', 'myCounter', 1, {agg: ['sum']});
 ``` 
 These methods receive a metric type, metric name and a metric value as arguments and send a counter/gauge/timer metric.
  
