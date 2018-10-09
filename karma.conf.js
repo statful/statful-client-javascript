@@ -2,12 +2,12 @@
 
 module.exports = function(config) {
     config.set({
-        browsers: ['PhantomJS'],
+        browsers: ['jsdom'],
         files: [
             { pattern: require.resolve('usertiming'), include: false },
             { pattern: require.resolve('jasmine-ajax'), include: true },
             {
-                pattern: 'node_modules/babel-polyfill/browser.js',
+                pattern: 'node_modules/@babel/polyfill/dist/polyfill.min.js',
                 instrument: false
             },
             { pattern: 'tests.webpack.js', watched: false }
@@ -86,7 +86,7 @@ module.exports = function(config) {
                 global: {
                     // thresholds for all files
                     statements: 92,
-                    branches: 84,
+                    branches: 82,
                     functions: 92,
                     lines: 95
                 } //,
