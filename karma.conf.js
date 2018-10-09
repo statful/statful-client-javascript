@@ -1,17 +1,18 @@
 /*global __dirname, module*/
 
-module.exports = function (config) {
+module.exports = function(config) {
     config.set({
         browsers: ['PhantomJS'],
         files: [
             { pattern: require.resolve('usertiming'), include: false },
             { pattern: require.resolve('jasmine-ajax'), include: true },
-            { pattern: 'node_modules/babel-polyfill/browser.js', instrument: false },
+            {
+                pattern: 'node_modules/babel-polyfill/browser.js',
+                instrument: false
+            },
             { pattern: 'tests.webpack.js', watched: false }
         ],
-        frameworks: [
-            'jasmine'
-        ],
+        frameworks: ['jasmine'],
         preprocessors: {
             'src/**/*.js': ['webpack', 'sourcemap'],
             'tests.webpack.js': ['webpack']
@@ -33,17 +34,22 @@ module.exports = function (config) {
                             {
                                 loader: 'babel-loader',
                                 options: {
-                                    presets: ['env'],
+                                    presets: ['@babel/preset-env'],
                                     plugins: ['babel-plugin-add-module-exports']
                                 }
-                            },
+                            }
                         ]
                     },
                     {
                         test: /\.js$/,
                         enforce: 'post',
-                        exclude: [/tests\.js$/, /(node_modules)\//, /tests\.webpack\.js$/],
-                        loader: 'istanbul-instrumenter-loader'
+                        exclude: [
+                            /tests\.js$/,
+                            /(node_modules)\//,
+                            /tests\.webpack\.js$/
+                        ],
+                        loader: 'istanbul-instrumenter-loader',
+                        options: { esModules: true }
                     }
                 ]
             }
@@ -52,7 +58,6 @@ module.exports = function (config) {
             noInfo: true
         },
         coverageIstanbulReporter: {
-
             // reports can be any that are listed here: https://github.com/istanbuljs/istanbul-reports/tree/590e6b0089f67b723a1fdf57bc7ccc080ff189d7/lib
             reports: ['html', 'lcovonly', 'text-summary'],
 
@@ -67,25 +72,24 @@ module.exports = function (config) {
 
             // Most reporters accept additional config options. You can pass these through the `report-config` option
             'report-config': {
-
                 // all options available at: https://github.com/istanbuljs/istanbul-reports/blob/590e6b0089f67b723a1fdf57bc7ccc080ff189d7/lib/html/index.js#L135-L137
                 html: {
                     // outputs the report in ./coverage/html
                     subdir: 'html'
                 }
-
             },
 
             // enforce percentage thresholds
             // anything under these percentages will cause karma to fail with an exit code of 1 if not running in watch mode
             thresholds: {
                 emitWarning: false, // set to `true` to not fail the test command when thresholds are not met
-                global: { // thresholds for all files
-                    statements: 93,
+                global: {
+                    // thresholds for all files
+                    statements: 92,
                     branches: 84,
-                    functions: 93,
+                    functions: 92,
                     lines: 95
-                }//,
+                } //,
                 //each: { // thresholds per file
                 //    statements: 100,
                 //    lines: 100,
@@ -93,7 +97,6 @@ module.exports = function (config) {
                 //    functions: 100
                 //}
             }
-
-        },
+        }
     });
 };

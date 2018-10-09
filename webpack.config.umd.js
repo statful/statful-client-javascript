@@ -1,12 +1,14 @@
 const path = require('path');
 const webpack = require('webpack');
 const npmPackage = require('./package.json');
-const banner = `${npmPackage.name} ${npmPackage.version} \nCopyright 2018 Statful \nhttps://www.statful.com`;
+const banner = `${npmPackage.name} ${
+    npmPackage.version
+} \nCopyright 2018 Statful \nhttps://www.statful.com`;
 
 module.exports = () => {
     return {
         entry: {
-            'statful': './src/statful.js',
+            statful: './src/statful.js'
         },
         output: {
             path: path.resolve(__dirname, 'dist'),
@@ -14,9 +16,7 @@ module.exports = () => {
             library: 'statful',
             libraryTarget: 'umd'
         },
-        plugins: [
-            new webpack.BannerPlugin(banner)
-        ],
+        plugins: [new webpack.BannerPlugin(banner)],
         module: {
             rules: [
                 {
@@ -26,7 +26,7 @@ module.exports = () => {
                         {
                             loader: 'babel-loader',
                             options: {
-                                presets: ['env'],
+                                presets: ['@babel/preset-env'],
                                 plugins: ['babel-plugin-add-module-exports']
                             }
                         }
