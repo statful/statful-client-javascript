@@ -3,6 +3,7 @@ Statful client for Javascript. This client is intended to gather metrics and sen
 
 [![Build Status](https://travis-ci.org/statful/statful-client-javascript.svg?branch=master)](https://travis-ci.org/statful/statful-client-javascript)
 [![devDependency Status](https://david-dm.org/statful/statful-client-javascript/dev-status.svg)](https://david-dm.org/statful/statful-client-javascript#info=devDependencies)
+[![install size](https://packagephobia.now.sh/badge?p=statful-client-javascript)](https://packagephobia.now.sh/result?p=statful-client-javascript)
 
 
 ## Table of Contents
@@ -23,22 +24,21 @@ It supports every browser that has full support for the ECMAScript 5 specificati
 ## Installation
 
 ```
-bower install --save statful-client-javascript
+npm install --save statful-client-javascript
 ```
 
 or
 
 ```
-npm install --save statful-client-javascript
+bower install --save statful-client-javascript
 ```
-
 
 ## Quick Start
 
 After installing Statful Client you are ready to use it. The quickest way is to do the following:
 
 ```javascript
-    <script type="text/javascript" src="bower_components/statful-client-javascript/dist/statful.min.js"></script>
+    <script type="text/javascript" src="node_modules/statful-client-javascript/dist/statful.umd.min.js"></script>
 
     <script>    
         // Init statful       
@@ -56,7 +56,7 @@ After installing Statful Client you are ready to use it. The quickest way is to 
 
 ## Reference
 
-Detailed reference if you want to take full advantage from Statful.
+Reference if you want to take full advantage from Statful.
 
 ### Global configuration
 
@@ -69,7 +69,7 @@ The custom options that can be set on config param are detailed below.
 | app | Defines the application global name. If specified sets a global tag `app=setValue`. | `string` | **undefined** | **NO** |
 | namespace | Defines the global namespace. | `string` | `web` | **NO** |
 | sampleRate | Defines the rate sampling. **Should be a number between [1, 100]**. | `number` | `100` | **NO** |
-| flushInterval | Defines the periodicity of buffer flushes in **miliseconds**. | `number` | `10000` | **NO** |
+| flushInterval | Defines the periodicity of buffer flushes in **milliseconds**. | `number` | `10000` | **NO** |
 | timeout | Defines the timeout. | `number` | `2000` | **NO** |
 | tags | Defines the global tags. | `object` | `{}` | **NO** |
 | aggregations | Defines the global aggregations. | `object` | `[]` | **NO** |
@@ -159,7 +159,7 @@ You can omit both start and end mark names:
 ### Installation
 
 ```bash
-$ yarn install
+$ npm install
 ```
 
 ### Tests

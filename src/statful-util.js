@@ -6,9 +6,18 @@ export default class StatfulUtil {
         Object.assign(this.config, config);
 
         this.logger = new StatfulLogger(this.config.debug);
-        if (this.config && this.config.flushInterval) {
-            this.registerQueue(this.config.flushInterval);
+        let flushInterval = 10000;
+
+        if (
+            this.config &&
+            this.config.flushInterval &&
+            typeof this.config.flushInterval === 'number' &&
+            this.config.flushInterval > 0
+        ) {
+            flushInterval = this.config.flushInterval;
         }
+
+        this.registerQueue(flushInterval);
     }
 
     /**
@@ -20,7 +29,7 @@ export default class StatfulUtil {
         const requestData = JSON.stringify(data);
 
         if (!this.config.dryrun) {
-            let xmlHttp = new XMLHttpRequest();
+            const xmlHttp = new XMLHttpRequest();
             xmlHttp.open('POST', requestUrl, true);
             xmlHttp.timeout = this.config.timeout;
 
@@ -32,7 +41,11 @@ export default class StatfulUtil {
                 if (xmlHttp.status == 200 || xmlHttp.status == 201) {
                     this.logger.debug('Successfully send metric');
                 } else {
-                    this.logger.debug('Error send metric', requestUrl, xmlHttp.status);
+                    this.logger.debug(
+                        'Error send metric',
+                        requestUrl,
+                        xmlHttp.status
+                    );
                 }
             };
         } else {
@@ -55,7 +68,6 @@ export default class StatfulUtil {
                     this.sendData(this.metricsQueue);
                     this.metricsQueue = [];
                 }
-
             }, flushInterval);
 
             window.addEventListener('beforeunload', () => {
@@ -74,7 +86,11 @@ export default class StatfulUtil {
      * @param {Boolean} usingQueue
      */
     addMetric(metric = {}, usingQueue = true) {
-        if (metric && typeof metric.isValid === 'function' && metric.isValid()) {
+        if (
+            metric &&
+            typeof metric.isValid === 'function' &&
+            metric.isValid()
+        ) {
             if (this.shouldAddMetric(metric)) {
                 if (usingQueue) {
                     this.metricsQueue.push(metric);
@@ -93,8 +109,9 @@ export default class StatfulUtil {
      * Determines is a metric should be sent to the server
      * @param {object} metric - object to be sent
      */
-    shouldAddMetric (metric = {}) {
-        const sampleRate = (metric.sampleRate || this.config.sampleRate || 100) / 100;
+    shouldAddMetric(metric = {}) {
+        const sampleRate =
+            (metric.sampleRate || this.config.sampleRate || 100) / 100;
 
         return Math.random() <= sampleRate;
     }

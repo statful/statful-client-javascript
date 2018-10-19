@@ -1,4 +1,14 @@
-const aggregationList = ['avg', 'count', 'sum', 'first', 'last', 'p90', 'p95', 'min', 'max'];
+const aggregationList = [
+    'avg',
+    'count',
+    'sum',
+    'first',
+    'last',
+    'p90',
+    'p95',
+    'min',
+    'max'
+];
 const aggregationFrequencyList = [10, 30, 60, 120, 180, 300];
 
 export default class Metric {
@@ -17,9 +27,22 @@ export default class Metric {
             typeAggregationFrequency = config[type].aggregationFrequency;
         }
 
-        this.tags = this.buildTags(options.tags, config.tags, typeTags, config.app);
-        this.aggregations = this.buildAggregations(options.aggregations, config.aggregations, typeAggregations);
-        this.aggregationFrequency = this.buildAggregationFrequency(options.aggregationFrequency, config.aggregationFrequency, typeAggregationFrequency);
+        this.tags = this.buildTags(
+            options.tags,
+            config.tags,
+            typeTags,
+            config.app
+        );
+        this.aggregations = this.buildAggregations(
+            options.aggregations,
+            config.aggregations,
+            typeAggregations
+        );
+        this.aggregationFrequency = this.buildAggregationFrequency(
+            options.aggregationFrequency,
+            config.aggregationFrequency,
+            typeAggregationFrequency
+        );
         this.namespace = options.namespace || config.namespace;
         this.sampleRate = options.sampleRate || config.sampleRate;
     }
@@ -53,12 +76,18 @@ export default class Metric {
      * @param {Array} typeAggregations - list of type aggregations
      * @returns {*|Array}
      */
-    buildAggregations(methodAggregations = [], globalAggregations = [], typeAggregations = []) {
+    buildAggregations(
+        methodAggregations = [],
+        globalAggregations = [],
+        typeAggregations = []
+    ) {
         let aggregations = [];
 
         aggregations = aggregations.concat(globalAggregations);
         aggregations = aggregations.concat(typeAggregations).filter(this.uniq);
-        aggregations = aggregations.concat(methodAggregations).filter(this.uniq);
+        aggregations = aggregations
+            .concat(methodAggregations)
+            .filter(this.uniq);
 
         return this.filterAggregations(aggregations);
     }
@@ -92,7 +121,7 @@ export default class Metric {
      * @returns {Array}
      */
     filterAggregations(aggregations = []) {
-        return aggregations.filter((item) => aggregationList.includes(item));
+        return aggregations.filter(item => aggregationList.includes(item));
     }
 
     /**
@@ -101,7 +130,7 @@ export default class Metric {
      * @returns {*}
      */
     filterAggregationFrequency(frequency) {
-        return (aggregationFrequencyList.includes(frequency)) ? frequency : 10;
+        return aggregationFrequencyList.includes(frequency) ? frequency : 10;
     }
 
     /**

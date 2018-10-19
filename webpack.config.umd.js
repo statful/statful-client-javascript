@@ -14,7 +14,8 @@ module.exports = () => {
             path: path.resolve(__dirname, 'dist'),
             filename: '[name].umd.min.js',
             library: 'statful',
-            libraryTarget: 'umd'
+            libraryTarget: 'umd',
+            libraryExport: 'default'
         },
         plugins: [new webpack.BannerPlugin(banner)],
         module: {

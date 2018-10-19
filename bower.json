@@ -1,17 +1,10 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.1.4",
+  "version": "2.1.7",
   "description": "Statful client for Javascript applications",
   "main": "dist/statful.umd.min.js",
-  "authors": [
-    "Jose Tavares <jose.tavares@mindera.com>"
-  ],
+  "authors": ["Jose Tavares <jose.tavares@mindera.com>"],
   "license": "MIT",
   "homepage": "https://github.com/statful/statful-client-javascript",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "tests"
-  ]
+  "ignore": ["**/.*", "node_modules", "tests", "bundle"]
 }
