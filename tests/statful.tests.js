@@ -1,6 +1,6 @@
+import Metric from '../src/metric.model';
 import statful from '../src/statful';
 import StatfulUtil from '../src/statful-util';
-import Metric from '../src/metric.model';
 
 describe('Statful Client Unit testing', () => {
     afterEach(() => {
@@ -17,10 +17,14 @@ describe('Statful Client Unit testing', () => {
         expect(statful.config.tags).toEqual({});
         expect(statful.config.aggregations).toEqual([]);
         expect(statful.config.aggregationFrequency).toEqual(10);
-        expect(statful.config.flushInterval).toEqual(10000);
+        expect(statful.config.flushInterval).toEqual(undefined);
 
-        expect(statful.config.timer.tags).toEqual({unit: 'ms'});
-        expect(statful.config.timer.aggregations).toEqual(['avg', 'p90', 'count']);
+        expect(statful.config.timer.tags).toEqual({ unit: 'ms' });
+        expect(statful.config.timer.aggregations).toEqual([
+            'avg',
+            'p90',
+            'count'
+        ]);
 
         expect(statful.config.counter.tags).toEqual({});
         expect(statful.config.counter.aggregations).toEqual(['sum', 'count']);
@@ -35,8 +39,8 @@ describe('Statful Client Unit testing', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
-            timer: {tags: {foo: 'bar'}},
-            gauge: {tags: {meh: 'yep'}, aggregations: ['derivative']}
+            timer: { tags: { foo: 'bar' } },
+            gauge: { tags: { meh: 'yep' }, aggregations: ['derivative'] }
         });
 
         let util = statful.util;
@@ -44,15 +48,20 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             agg: [],
             aggFreq: 300
         };
 
         statful.gauge('test', 1234, options);
 
-
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -60,8 +69,12 @@ describe('Statful Client Unit testing', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
-            timer: {tags: {foo: 'bar'}},
-            gauge: {tags: {meh: 'yep'}, aggregations: [], aggregationFrequency: 60}
+            timer: { tags: { foo: 'bar' } },
+            gauge: {
+                tags: { meh: 'yep' },
+                aggregations: [],
+                aggregationFrequency: 60
+            }
         });
 
         let util = statful.util;
@@ -69,13 +82,19 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             agg: []
         };
 
         statful.gauge('test', 1234, options);
 
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -83,8 +102,12 @@ describe('Statful Client Unit testing', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last'],
-            timer: {tags: {foo: 'bar'}},
-            gauge: {tags: {meh: 'yep'}, aggregations: [], aggregationFrequency: 60}
+            timer: { tags: { foo: 'bar' } },
+            gauge: {
+                tags: { meh: 'yep' },
+                aggregations: [],
+                aggregationFrequency: 60
+            }
         });
 
         let util = statful.util;
@@ -92,14 +115,20 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             agg: [],
             sampleRate: 50
         };
 
         statful.gauge('test', 1234, options);
 
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -107,8 +136,8 @@ describe('Statful Client Unit testing', () => {
         statful.initialize({
             tags: {},
             aggregations: ['last', 'invalid'],
-            timer: {tags: {foo: 'bar'}},
-            gauge: {tags: {meh: 'yep'}, aggregations: []}
+            timer: { tags: { foo: 'bar' } },
+            gauge: { tags: { meh: 'yep' }, aggregations: [] }
         });
 
         let util = statful.util;
@@ -116,14 +145,20 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             agg: ['fail'],
             aggFreq: 300
         };
 
         statful.gauge('test', 1234, options);
 
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -131,7 +166,7 @@ describe('Statful Client Unit testing', () => {
         statful.initialize({
             tags: {},
             aggregations: [],
-            gauge: {tags: {meh: 'yep'}, aggregations: []}
+            gauge: { tags: { meh: 'yep' }, aggregations: [] }
         });
 
         let util = statful.util;
@@ -139,13 +174,19 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             aggFreq: 1234
         };
 
         statful.gauge('test', 1234, options);
 
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -177,7 +218,9 @@ describe('Statful Client Unit testing', () => {
         };
         statful.registerMeasure('measure', 'metric', options);
 
-        expect(statful.measureTimeUserTiming('measure')).toEqual(jasmine.any(Number));
+        expect(statful.measureTimeUserTiming('measure')).toEqual(
+            jasmine.any(Number)
+        );
 
         statful.clearMarks();
         statful.clearMeasures();
@@ -200,7 +243,9 @@ describe('Statful Client Unit testing', () => {
 
         statful.clearMarks(['start_test']);
 
-        expect(window.performance.clearMarks).toHaveBeenCalledWith('start_test');
+        expect(window.performance.clearMarks).toHaveBeenCalledWith(
+            'start_test'
+        );
     });
 
     it('should clear all performance measures when calling clearMeasures without arguments', () => {
@@ -220,7 +265,9 @@ describe('Statful Client Unit testing', () => {
 
         statful.clearMeasures(['start_test']);
 
-        expect(window.performance.clearMeasures).toHaveBeenCalledWith('start_test');
+        expect(window.performance.clearMeasures).toHaveBeenCalledWith(
+            'start_test'
+        );
     });
 
     it('should add a performance mark when calling registerMark', () => {
@@ -250,10 +297,14 @@ describe('Statful Client Unit testing', () => {
 
         statful.registerMeasure('measure_test', 'metric_test');
 
-        expect(window.performance.measure).toHaveBeenCalledWith('measure_test', undefined, jasmine.any(String));
+        expect(window.performance.measure).toHaveBeenCalledWith(
+            'measure_test',
+            undefined,
+            jasmine.any(String)
+        );
     });
 
-    it('should call addMetric when registerMeasure', (done) => {
+    it('should call addMetric when registerMeasure', done => {
         statful.initialize();
 
         statful.registerMark('start_test');
@@ -267,7 +318,7 @@ describe('Statful Client Unit testing', () => {
             let options = {
                 startMark: 'start_test',
                 endMark: 'end_test',
-                tags: {mark: 'measure'},
+                tags: { mark: 'measure' },
                 aggregations: [],
                 clearMarks: true,
                 clearMeasures: true
@@ -288,13 +339,19 @@ describe('Statful Client Unit testing', () => {
         spyOn(statful, 'measureTimeUserTiming').and.returnValue(1000);
 
         let options = {
-            tags: {mark: 'measure'},
+            tags: { mark: 'measure' },
             aggregations: []
         };
 
         statful.registerMeasure('measure_test', 'metric_test', options);
 
-        const metric = new Metric('metric_test', 'timer', 1000, options, statful.config);
+        const metric = new Metric(
+            'metric_test',
+            'timer',
+            1000,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -306,7 +363,7 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'foo'},
+            tags: { mark: 'foo' },
             agg: []
         };
 
@@ -323,7 +380,7 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'foo'},
+            tags: { mark: 'foo' },
             agg: []
         };
 
@@ -352,14 +409,20 @@ describe('Statful Client Unit testing', () => {
         spyOn(util, 'addMetric');
 
         let options = {
-            tags: {mark: 'gauge'},
+            tags: { mark: 'gauge' },
             agg: [],
             aggFreq: 30
         };
 
         statful.gauge('test', 1234, options);
 
-        const metric = new Metric('test', 'gauge', 1234, options, statful.config);
+        const metric = new Metric(
+            'test',
+            'gauge',
+            1234,
+            options,
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, true);
     });
 
@@ -372,7 +435,13 @@ describe('Statful Client Unit testing', () => {
 
         statful.sendMetric('counter', 'metricName', 10, {});
 
-        const metric = new Metric('metricName', 'counter', 10, {}, statful.config);
+        const metric = new Metric(
+            'metricName',
+            'counter',
+            10,
+            {},
+            statful.config
+        );
         expect(util.addMetric).toHaveBeenCalledWith(metric, false);
     });
 });

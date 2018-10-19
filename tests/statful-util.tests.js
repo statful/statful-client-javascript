@@ -1,5 +1,5 @@
-import StatfulUtil from '../src/statful-util';
 import Metric from '../src/metric.model';
+import StatfulUtil from '../src/statful-util';
 
 describe('Statful Util Unit testing', () => {
     let statfulUtil;
@@ -115,9 +115,10 @@ describe('Statful Util Unit testing', () => {
         expect(statfulUtil.sendData).toHaveBeenCalledWith([metricModel]);
     });
 
-
     it('should not add metric - metric sample rate', () => {
-        const metricModel = new Metric('name', 'counter', 2, {sampleRate: 50});
+        const metricModel = new Metric('name', 'counter', 2, {
+            sampleRate: 50
+        });
 
         spyOn(Math, 'random').and.returnValue(0.6);
         expect(statfulUtil.shouldAddMetric(metricModel)).toEqual(false);
