@@ -109,6 +109,9 @@ Read the methods options reference bellow to get more information about the defa
 | namespace | Defines the namespace of the metric. It overrides the global namespace configuration. | `string` | `web` | `web` | `web` |
 | tags | Defines the tags of the metric. These tags are merged with the ones configured globally, including method defaults. | `object` | `{}` | `{}` | `{ unit: 'ms' }` |
 
+### Plugins
+
+* [statful-browser-plugin](https://github.com/statful/statful-browser-plugin) - add browser tags
 
 ### User Timing
 
