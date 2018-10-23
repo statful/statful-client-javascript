@@ -185,4 +185,4 @@ Follow the standard *Fork and Pull Request* workflow and:
 
 ## License
 
-Statful Javascript Client is available under the MIT license. See the [LICENSE](https://raw.githubusercontent.com/statful/statful-client-objc/master/LICENSE) file for more information.
+Statful Javascript Client is available under the MIT license. See the [LICENSE](https://raw.githubusercontent.com/statful/statful-client-javascript/master/LICENSE) file for more information.
