@@ -1,6 +1,6 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.1.7",
+  "version": "2.2.0",
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
@@ -22,18 +22,18 @@
   },
   "homepage": "https://github.com/statful/statful-client-javascript#readme",
   "devDependencies": {
-    "@babel/core": "^7.1.2",
+    "@babel/core": "^7.1.5",
     "@babel/polyfill": "^7.0.0",
-    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-env": "^7.1.5",
     "babel-loader": "^8.0.4",
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-transform-object-assign": "^6.22.0",
-    "eslint": "^5.7.0",
+    "eslint": "^5.9.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^3.4.0",
-    "jasmine-core": "^3.2.1",
-    "jsdom": "^12.2.0",
-    "karma": "^3.1.0",
+    "jasmine-core": "^3.3.0",
+    "jsdom": "^13.0.0",
+    "karma": "^3.1.1",
     "karma-coverage": "^1.1.2",
     "karma-coverage-istanbul-reporter": "^2.0.4",
     "karma-jasmine": "^1.1.2",
@@ -42,7 +42,7 @@
     "karma-webpack": "^v4.0.0-beta.0",
     "request": "^2.88.0",
     "usertiming": "^0.1.8",
-    "webpack": "^4.22.0",
+    "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {}
