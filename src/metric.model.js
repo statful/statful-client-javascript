@@ -6,6 +6,7 @@ const aggregationList = [
     'last',
     'p90',
     'p95',
+    'p99',
     'min',
     'max'
 ];
