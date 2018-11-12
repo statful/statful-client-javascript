@@ -444,4 +444,18 @@ describe('Statful Client Unit testing', () => {
         );
         expect(util.addMetric).toHaveBeenCalledWith(metric, false);
     });
+
+    it('should use a plugin', () => {
+        statful.initialize();
+        const plugin = {
+            onInit: () => {}
+        };
+
+        spyOn(plugin, 'onInit');
+
+        statful.use(plugin);
+
+        expect(statful.config.plugins.length).toEqual(1);
+        expect(plugin.onInit).toHaveBeenCalled();
+    });
 });

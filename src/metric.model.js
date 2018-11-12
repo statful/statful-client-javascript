@@ -31,6 +31,7 @@ export default class Metric {
             options.tags,
             config.tags,
             typeTags,
+            config.plugins,
             config.app
         );
         this.aggregations = this.buildAggregations(
@@ -52,15 +53,28 @@ export default class Metric {
      * @param {object} methodTags - list of method tags
      * @param {object} globalTags - list of global tags
      * @param {object} typeTags - list of type tags
+     * @param {array} plugins - list of plugins
      * @param {string} app - app tag value
      * @returns {*}
      */
-    buildTags(methodTags = {}, globalTags = {}, typeTags = {}, app) {
+    buildTags(
+        methodTags = {},
+        globalTags = {},
+        typeTags = {},
+        plugins = [],
+        app
+    ) {
         let tags = {};
 
         Object.assign(tags, globalTags);
         Object.assign(tags, typeTags);
         Object.assign(tags, methodTags);
+
+        plugins.forEach(plugin => {
+            if (plugin && plugin.tags) {
+                Object.assign(tags, plugin.tags);
+            }
+        });
 
         if (!tags.app && app) {
             tags.app = app;

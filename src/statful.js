@@ -42,7 +42,8 @@ const defaultConfig = {
         aggregations: ['last']
     },
     timeout: 2000,
-    sampleRate: 100
+    sampleRate: 100,
+    plugins: []
 };
 
 export default class Statful {
@@ -295,5 +296,18 @@ export default class Statful {
         );
 
         this.util.addMetric(metric, false);
+    }
+
+    /**
+     * Use a specific plugin
+     * @param plugin - plugin instance
+     */
+    static use(plugin) {
+        if (typeof plugin === 'object') {
+            this.config.plugins.push(plugin);
+            if (typeof plugin.onInit === 'function') {
+                plugin.onInit();
+            }
+        }
     }
 }
