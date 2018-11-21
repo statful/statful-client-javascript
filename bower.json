@@ -1,6 +1,6 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.1.7",
+  "version": "2.2.1",
   "description": "Statful client for Javascript applications",
   "main": "dist/statful.umd.min.js",
   "authors": ["Jose Tavares <jose.tavares@mindera.com>"],
