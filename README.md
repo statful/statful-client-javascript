@@ -82,7 +82,7 @@ The custom options that can be set on config param are detailed below.
 
 These methods receive a metric name and a metric value as arguments and send a counter/gauge/timer metric. 
 If the options parameter is omitted, the default values are used.
-These methods will add metrics to a queue that will be flushed using the interval defined on flushInterval.
+**These methods will add metrics to a queue that will be flushed using the interval defined on flushInterval.**
 
 ```javascript
 statful.counter('myCounter', 1, {agg: ['sum']});
