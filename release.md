@@ -4,7 +4,9 @@ These are the minimum required steps to publish the statful javascript client on
 Must be executed in the following order
 
 ## Locally
-1. update version in package.json
+1. ```npm run test```
+2. ```npm run build```
+3. update version in package.json
 
 ## GitHub
 
