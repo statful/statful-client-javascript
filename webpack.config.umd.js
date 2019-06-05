@@ -1,39 +1,15 @@
 const path = require('path');
-const webpack = require('webpack');
-const npmPackage = require('./package.json');
-const banner = `${npmPackage.name} ${
-    npmPackage.version
-} \nCopyright 2018 Statful \nhttps://www.statful.com`;
+const merge = require('webpack-merge');
+const webpackConfig = require('./webpack.config');
 
 module.exports = () => {
-    return {
-        entry: {
-            statful: './src/statful.js'
-        },
+    return merge(webpackConfig, {
         output: {
             path: path.resolve(__dirname, 'dist'),
             filename: '[name].umd.min.js',
             library: 'statful',
             libraryTarget: 'umd',
             libraryExport: 'default'
-        },
-        plugins: [new webpack.BannerPlugin(banner)],
-        module: {
-            rules: [
-                {
-                    test: /\.(js)$/,
-                    exclude: /node_modules/,
-                    use: [
-                        {
-                            loader: 'babel-loader',
-                            options: {
-                                presets: ['@babel/preset-env'],
-                                plugins: ['babel-plugin-add-module-exports']
-                            }
-                        }
-                    ]
-                }
-            ]
         }
-    };
+    });
 };

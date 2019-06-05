@@ -1,5 +1,3 @@
-/*global __dirname, module*/
-
 module.exports = function(config) {
     config.set({
         browsers: ['jsdom'],
