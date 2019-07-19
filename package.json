@@ -1,6 +1,6 @@
 {
   "name": "statful-client-javascript",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Statful client for Javascript applications",
   "banner": "/**\n* <%= pkg.name %> <%= pkg.version %>\n* Copyright 2018 Statful <https://www.statful.com/>\n*/\n",
   "scripts": {
