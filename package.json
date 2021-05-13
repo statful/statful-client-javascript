@@ -45,5 +45,8 @@
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.1"
+  },
+  "dependencies": {
+    "ssri": "^6.0.2"
   }
 }
