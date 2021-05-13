@@ -33,7 +33,7 @@
     "jasmine-ajax": "^4.0.0",
     "jasmine-core": "^3.4.0",
     "jsdom": "^15.1.1",
-    "karma": "^5.0.8",
+    "karma": "^6.3.2",
     "karma-coverage": "^2.0.2",
     "karma-coverage-istanbul-reporter": "^2.0.5",
     "karma-jasmine": "^2.0.1",
@@ -45,6 +45,5 @@
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.1"
-  },
-  "dependencies": {}
+  }
 }
